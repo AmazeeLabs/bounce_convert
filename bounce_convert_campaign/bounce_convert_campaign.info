@@ -1,9 +1,8 @@
-name = Bounce Convert
+name = Bounce Convert Campaign
 description = Detect and convert exiting web visitors into revenue
 package = Other
 core = 7.x
 dependencies[] = webform
 dependencies[] = field_group
+dependencies[] = modal_forms
 version = "7.x-1.0-beta1"
-files[] = bounce_convert.install
-files[] = bounce_convert.module
