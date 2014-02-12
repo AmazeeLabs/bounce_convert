@@ -1,0 +1,401 @@
+<?php
+
+/**
+ * @file
+ * Primarily Drupal hooks and global API functions to manipulate this module.
+ *
+ * This is the main module file for Bounce Convert. The main entry points into
+ * this module are hook_node_info(),hook_field_group_info(),
+ * bounce_convert_ctools_plugin_api() and hook_form(), where it handles
+ * creating content type and form values.
+ */
+/**
+ * Load bounce_convert.admin.inc
+ */
+module_load_include('inc', 'bounce_convert', 'bounce_convert.admin');
+
+/**
+ * Implements hook_menu().
+ */
+function bounce_convert_menu() {
+  $items = array();
+  $items['bounce_convert/%webform_menu/results'] = array(
+    'title' => 'Results',
+    'page callback' => 'webform_results_submissions',
+    'page arguments' => array(1, FALSE, '50'),
+    'access callback' => 'webform_results_access',
+    'access arguments' => array(1),
+    'file path' => drupal_get_path('module', 'webform'),
+    'file' => 'includes/webform.report.inc',
+    'weight' => 2,
+    'type' => MENU_NORMAL_ITEM,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function bounce_convert_ctools_plugin_api($module = NULL, $api = NULL) {
+  if ($module == "field_group" && $api == "field_group") {
+    return array("version" => "1");
+  }
+}
+
+/**
+ * Implements hook_node_info().
+ */
+function bounce_convert_node_info() {
+  $items = array(
+    'bounce_convert_campaign' => array(
+      'name' => t('Bounce Convert Campaign'),
+      'base' => 'bounce_convert',
+      'description' => t('Create a new campaign to detect and convert exiting web visitors into revenue.'),
+      'has_title' => TRUE,
+      'title_label' => t('Campaign title'),
+    ),
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_field_group_info().
+ */
+function bounce_convert_field_group_info() {
+  $export = array();
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_bcc_modal_options|node|bounce_convert|form';
+  $field_group->group_name = 'group_bcc_modal_options';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'bounce_convert_campaign';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Modal options',
+    'weight' => '3',
+    'children' => array(
+      0 => 'field_bcc_background_color',
+      1 => 'field_bcc_background_opacity',
+      2 => 'field_bcc_modal_height',
+      3 => 'field_bcc_modal_width',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-bcc-modal-options field-group-fieldset',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $export['group_bcc_modal_options|node|bounce_convert|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_bcc_pages|node|bounce_convert|form';
+  $field_group->group_name = 'group_bcc_pages';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'bounce_convert_campaign';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_bcc_visibility_settings';
+  $field_group->data = array(
+    'label' => 'Pages',
+    'weight' => '7',
+    'children' => array(
+      0 => 'field_bcc_pages_list',
+      1 => 'field_bcc_pages_option',
+    ),
+    'format_type' => 'tab',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-bcc-pages field-group-tab',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $export['group_bcc_pages|node|bounce_convert|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_bcc_user_roles|node|bounce_convert|form';
+  $field_group->group_name = 'group_bcc_user_roles';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'bounce_convert_campaign';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_bcc_visibility_settings';
+  $field_group->data = array(
+    'label' => 'Roles',
+    'weight' => '8',
+    'children' => array(
+      0 => 'field_bcc_specific_user_roles',
+    ),
+    'format_type' => 'tab',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-bcc-user-roles field-group-tab',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $export['group_bcc_user_roles|node|bounce_convert|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_bcc_visibility_settings|node|bounce_convert|form';
+  $field_group->group_name = 'group_bcc_visibility_settings';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'bounce_convert_campaign';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Visibility settings',
+    'weight' => '7',
+    'children' => array(
+      0 => 'group_bcc_pages',
+      1 => 'group_bcc_user_roles',
+    ),
+    'format_type' => 'tabs',
+    'format_settings' => array(
+      'formatter' => '',
+      'instance_settings' => array(
+        'classes' => 'group-bcc-visibility-settings field-group-tabs',
+      ),
+    ),
+  );
+  $export['group_bcc_visibility_settings|node|bounce_convert|form'] = $field_group;
+
+  return $export;
+}
+
+/**
+ * Implement hook_form()
+ */
+function bounce_convert_form($node, $form_state) {
+  return node_content_form($node, $form_state);
+}
+
+/**
+ * Implement hook_form_alter()
+ * To update form field values after CRUD operation on webforms and user roles
+ */
+function bounce_convert_form_alter(&$form, &$form_state, $form_id) {
+//  drupal_set_message($form_id);
+
+  $pos = strpos($form_id, 'webform_client_form_');
+  if ($pos !== false) {
+    if ($form_id == 'webform_client_form_' . $form['#node']->vid) {
+      $form['#submit'][] = 'bounce_convert_user_conversion';
+    }
+  }
+
+
+  if ($form_id == "bounce_convert_campaign_node_form") {
+    //get form field languge for exact match
+    $lang = $form['field_bcc_select_webform']['#language'];
+    $form['field_bcc_select_webform'][$lang]['#options'] = bounce_convert_webforms();
+
+    $form['field_bcc_specific_user_roles'][$lang]['#options'] = user_roles($membersonly = FALSE);
+    //if node edit page then set default value
+    if (arg(0) == 'node' && arg(2) == 'edit') {
+      $node = node_load(arg(1));
+      $field_bcc_select_webform = field_get_items('node', $node, 'field_bcc_select_webform');
+      $form['field_bcc_select_webform'][$lang]['#default_value'] = $field_bcc_select_webform[0]['value'];
+
+      $field_bcc_specific_user_roles = field_get_items('node', $node, 'field_bcc_specific_user_roles');
+      if (!empty($field_bcc_specific_user_roles)) {
+        foreach ($field_bcc_specific_user_roles as $value) {
+          $rid = $value['value'];
+          $field_bcc_roles_default_options[$rid] = $rid;
+        }
+        //Show campaign for specific roles
+        $form['field_bcc_specific_user_roles'][$lang]['#default_value'] = $field_bcc_roles_default_options;
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_init().
+ */
+function bounce_convert_init() {
+  global $user;
+  list ($bounce_convert_webform_id, $bounce_convert_cookie_expiry) = bounce_convert_check_campaigns($user->roles);
+  if ($bounce_convert_webform_id) {
+    $bounce_convert_js_param = array(
+      'webform_id' => $bounce_convert_webform_id,
+      'cookie_expiry' => $bounce_convert_cookie_expiry
+    );
+    global $base_url;
+
+    drupal_add_js(array('bounce_convert' => $bounce_convert_js_param), 'setting');
+    drupal_set_message(t('<a class="ctools-use-modal ctools-modal-modal-popup-medium" style="display:none;" href="' . $base_url . '/modal_forms/nojs/webform/' . $bounce_convert_webform_id . '">&nbsp;Link to click</a>'), '', FALSE);
+    drupal_add_js(drupal_get_path('module', 'bounce_convert') . '/js/bounce_convert.js');
+  }
+}
+
+/**
+ * Implementation of hook_views_api().
+ */
+function bounce_convert_views_api() {
+  return array(
+    'api' => 3.0,
+    'path' => drupal_get_path('module', 'bounce_convert')
+  );
+}
+
+/**
+ * Implementation of hook_views_default_views().
+ */
+function bounce_convert_views_default_views() {
+
+  $view = new view();
+  $view->name = 'bounce_convert_campaigns';
+  $view->description = '';
+  $view->tag = 'default';
+  $view->base_table = 'node';
+  $view->human_name = 'Bounce Convert Campaigns';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'Bounce Convert Campaigns';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '10';
+  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_options']['columns'] = array(
+    'title' => 'title',
+    'field_bcc_active' => 'field_bcc_active',
+    'changed' => 'changed',
+  );
+  $handler->display->display_options['style_options']['default'] = '-1';
+  $handler->display->display_options['style_options']['info'] = array(
+    'title' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_bcc_active' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'changed' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+  );
+  /* No results behavior: Global: Text area */
+  $handler->display->display_options['empty']['area']['id'] = 'area';
+  $handler->display->display_options['empty']['area']['table'] = 'views';
+  $handler->display->display_options['empty']['area']['field'] = 'area';
+  $handler->display->display_options['empty']['area']['label'] = 'No result found';
+  $handler->display->display_options['empty']['area']['empty'] = TRUE;
+  $handler->display->display_options['empty']['area']['content'] = 'No record found.';
+  $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
+  /* Field: Content: Select webform */
+  $handler->display->display_options['fields']['field_bcc_select_webform']['id'] = 'field_bcc_select_webform';
+  $handler->display->display_options['fields']['field_bcc_select_webform']['table'] = 'field_data_field_bcc_select_webform';
+  $handler->display->display_options['fields']['field_bcc_select_webform']['field'] = 'field_bcc_select_webform';
+  $handler->display->display_options['fields']['field_bcc_select_webform']['exclude'] = TRUE;
+  /* Field: Content: Nid */
+  $handler->display->display_options['fields']['nid']['id'] = 'nid';
+  $handler->display->display_options['fields']['nid']['table'] = 'node';
+  $handler->display->display_options['fields']['nid']['field'] = 'nid';
+  $handler->display->display_options['fields']['nid']['exclude'] = TRUE;
+  /* Field: Content: Title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'node';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['label'] = 'Name';
+  $handler->display->display_options['fields']['title']['alter']['make_link'] = TRUE;
+  $handler->display->display_options['fields']['title']['alter']['path'] = 'bounce_convert/[field_bcc_select_webform]/results';
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  $handler->display->display_options['fields']['title']['link_to_node'] = FALSE;
+  /* Field: Content: Active */
+  $handler->display->display_options['fields']['field_bcc_active']['id'] = 'field_bcc_active';
+  $handler->display->display_options['fields']['field_bcc_active']['table'] = 'field_data_field_bcc_active';
+  $handler->display->display_options['fields']['field_bcc_active']['field'] = 'field_bcc_active';
+  /* Field: Content: Updated date */
+  $handler->display->display_options['fields']['changed']['id'] = 'changed';
+  $handler->display->display_options['fields']['changed']['table'] = 'node';
+  $handler->display->display_options['fields']['changed']['field'] = 'changed';
+  $handler->display->display_options['fields']['changed']['date_format'] = 'time ago';
+  /* Field: Content: Edit link */
+  $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
+  $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
+  $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
+  $handler->display->display_options['fields']['edit_node']['label'] = 'Edit';
+  /* Field: Content: Delete link */
+  $handler->display->display_options['fields']['delete_node']['id'] = 'delete_node';
+  $handler->display->display_options['fields']['delete_node']['table'] = 'views_entity_node';
+  $handler->display->display_options['fields']['delete_node']['field'] = 'delete_node';
+  $handler->display->display_options['fields']['delete_node']['label'] = 'Remove';
+  /* Sort criterion: Content: Post date */
+  $handler->display->display_options['sorts']['created']['id'] = 'created';
+  $handler->display->display_options['sorts']['created']['table'] = 'node';
+  $handler->display->display_options['sorts']['created']['field'] = 'created';
+  $handler->display->display_options['sorts']['created']['order'] = 'DESC';
+  /* Filter criterion: Content: Published */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = 1;
+  $handler->display->display_options['filters']['status']['group'] = 1;
+  $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+  /* Filter criterion: Content: Type */
+  $handler->display->display_options['filters']['type']['id'] = 'type';
+  $handler->display->display_options['filters']['type']['table'] = 'node';
+  $handler->display->display_options['filters']['type']['field'] = 'type';
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'bounce_convert_campaign' => 'bounce_convert_campaign',
+  );
+  /* Filter criterion: Content: Title */
+  $handler->display->display_options['filters']['title']['id'] = 'title';
+  $handler->display->display_options['filters']['title']['table'] = 'node';
+  $handler->display->display_options['filters']['title']['field'] = 'title';
+  $handler->display->display_options['filters']['title']['operator'] = 'word';
+  $handler->display->display_options['filters']['title']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['title']['expose']['operator_id'] = 'title_op';
+  $handler->display->display_options['filters']['title']['expose']['label'] = 'Campaign name';
+  $handler->display->display_options['filters']['title']['expose']['operator'] = 'title_op';
+  $handler->display->display_options['filters']['title']['expose']['identifier'] = 'title';
+  $handler->display->display_options['filters']['title']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    3 => 0,
+  );
+
+  /* Display: Page */
+  $handler = $view->new_display('page', 'Page', 'page');
+  $handler->display->display_options['path'] = 'bounce-convert-campaigns';
+
+  $views[$view->name] = $view;
+  return $views;
+}
