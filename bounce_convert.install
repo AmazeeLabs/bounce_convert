@@ -33,3 +33,80 @@ function bounce_convert_uninstall() {
   node_type_delete(BOUNCE_CONVERT_CONTENT_TYPE);
   field_purge_batch(1000);
 }
+
+function bounce_convert_schema() {
+  $schema = array();
+
+  $schema['bounce_convert_impressions'] = array(
+    'description' => t('Contains impressions and conversions of submited campaigns'),
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => t('Primary Key: Unique accesslog ID.'),
+      ),
+      'wid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'default' => 0,
+        'description' => 'Webform nid used for campaign',
+      ),
+      'sid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => t('Webform submissin ID'),
+      ),
+      'uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'default' => 0,
+        'description' => 'User ID {uid} of a current user',
+      ),
+      'impression' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'default' => 0,
+        'description' => 'Impression of campaign',
+      ),
+      'conversion' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'default' => 0,
+        'description' => 'Conversion of campaign',
+      ),
+      'ip_address' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => FALSE,
+        'description' => 'IP address of user that visited the page.',
+      ),
+      'path' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'description' => 'Internal path to page visited (relative to Drupal root.)',
+      ),
+      'timestamp' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Timestamp of when the page was visited.',
+      ),
+    ),
+    'primary key' => array('id'),
+    'indexes' => array(
+      'impression' => array('impression'),
+      'conversion' => array('conversion'),
+      'sid' => array('sid'),
+    ),
+  );
+
+  return $schema;
+}

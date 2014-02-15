@@ -1,0 +1,140 @@
+<?php
+
+/**
+ * Implements hook_views_data().
+ */
+function bounce_convert_views_data() {
+  $data = array();
+  $data['bounce_convert_impressions']['table']['group'] = t('Impressions/Conversions');
+
+  $data['bounce_convert_impressions']['table']['base'] = array(
+    'field' => 'id', // This is the identifier field for the table and view.
+    'title' => t('Impressions/Conversions'),
+    'help' => t('Bounce Convert contains content for Impressions and Conversions'),
+  );
+
+  $data['bounce_convert_impressions']['wid'] = array(
+    'title' => t('Webform ID'),
+    'help' => t('Webform ID related impression/conversion'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  $data['bounce_convert_impressions']['sid'] = array(
+    'title' => t('Sumbmission ID'),
+    'help' => t('Submission id related impression/conversion'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
+  $data['bounce_convert_impressions']['uid'] = array(
+    'title' => t('User ID'),
+    'help' => t('User ID {uid} of a user for impression/conversion'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  $data['bounce_convert_impressions']['impression'] = array(
+    'title' => t('Impression Status'),
+    'help' => t('Impression status for tracking record'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  $data['bounce_convert_impressions']['conversion'] = array(
+    'title' => t('Conversion Status'),
+    'help' => t('Conversion status whether convert or not'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  $data['bounce_convert_impressions']['ip_address'] = array(
+    'title' => t('IP address of a user who visit the page.'),
+    'help' => t('Conversion'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  $data['bounce_convert_impressions']['path'] = array(
+    'title' => t('Internal path'),
+    'help' => t('Internal path to page visited (relative to Drupal root.)'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
+  $data['bounce_convert_impressions']['timestamp'] = array(
+    'title' => t('Timestamp'), //Custom external table field
+    'help' => t('Timestamp of when the page was visited.'),
+    'field' => array(
+      'handler' => 'views_handler_field_date',
+      'click sortable' => TRUE,),
+    'filter' => array(
+      'handler' => 'views_handler_filter_date',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort_date',
+    ),
+  );
+
+  $data['bounce_convert_impressions']['id'] = array(
+    'title' => t('Unique identifier for impression'), //Custom external table field
+    'help' => t('Primary key for table'),
+    'field' => array('handler' => 'views_handler_field'),
+    'argument' => array('handler' => 'views_handler_argument_numeric'),
+    'filter' => array('handler' => 'views_handler_filter_numeric'),
+    'sort' => array('handler' => 'views_handler_sort_numeric')
+  );
+
+  return $data;
+}

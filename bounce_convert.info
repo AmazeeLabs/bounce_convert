@@ -6,4 +6,7 @@ dependencies[] = views
 dependencies[] = webform
 dependencies[] = field_group
 dependencies[] = modal_forms
+dependencies[] = charts
+dependencies[] = charts_google
+dependencies[] = date_popup
 version = "7.x-1.0-beta1"

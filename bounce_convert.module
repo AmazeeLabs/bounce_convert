@@ -19,19 +19,70 @@ module_load_include('inc', 'bounce_convert', 'bounce_convert.admin');
  */
 function bounce_convert_menu() {
   $items = array();
-  $items['bounce_convert/%webform_menu/results'] = array(
-    'title' => 'Results',
-    'page callback' => 'webform_results_submissions',
-    'page arguments' => array(1, FALSE, '50'),
+
+  // Campaigns listing.
+  $items['admin/content/campaigns'] = array(
+    'title' => 'Campaigns',
+    'description' => 'View and edit all the available campaigns on your site',
+    'page callback' => 'drupal_goto',
+    'page arguments' => array('admin/content/campaign'),
+    'type' => MENU_NORMAL_ITEM,
+    'access callback' => true,
+  );
+
+  // Campaign submission listing
+  $items['bounce-convert/%/results'] = array(
+    'title' => 'Campaign Report',
+    'page callback' => 'bounce_convert_get_submissions',
     'access callback' => 'webform_results_access',
     'access arguments' => array(1),
-    'file path' => drupal_get_path('module', 'webform'),
-    'file' => 'includes/webform.report.inc',
-    'weight' => 2,
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_CALLBACK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
   );
+
+  $items['bounce_convert_impression'] = array(
+    'page callback' => 'bounce_convert_impression_callback',
+    'access callback' => true,
+    'type' => MENU_CALLBACK,
+  );
   return $items;
+}
+
+function bounce_convert_impression_callback() {
+//  $wid = isset($_POST['wid']) ? $_POST['wid'] : '';
+   $wid = filter_input($_POST, 'wid');
+}
+
+module_load_include('inc', 'webform', 'includes/webform.report');
+
+function bounce_convert_get_submissions() {
+  $output = '';
+  if (is_numeric(arg(1))) {
+    $node = node_load(arg(1));
+
+    $view = views_get_view('bounce_convert_report_chart');
+    $view->execute_display();
+
+    $output .= '<script language="javascript" type="text/javascript" >
+               
+                </script>
+                <form name="form1">
+                <select name="jumpmenu" onChange="bounce_convert_jumpto(document.form1.jumpmenu.options[document.form1.jumpmenu.options.selectedIndex].value)">
+                <option value="http://localhost/drupal7/bounce-convert/1/results/today">Today</option>
+                <option value="http://localhost/drupal7/bounce-convert/1/results/yesterday">Yesterday</option>
+                <option value="http://localhost/drupal7/bounce-convert/1/results/7days">Last 7 Days</option>
+                <option value="http://localhost/drupal7/bounce-convert/1/results/30day">Last 30 Days</option>
+                <option value="http://localhost/drupal7/bounce-convert/1/results/this-month">This Month</option>
+                <option value="http://localhost/drupal7/bounce-convert/1/results/last-month">Last Month</option>
+                </select>
+                </form>';
+
+
+
+    $output .= $view->render();
+    $output .= webform_results_submissions($node, FALSE, '50');
+  }
+  return $output;
 }
 
 /**
@@ -191,7 +242,6 @@ function bounce_convert_form($node, $form_state) {
  * To update form field values after CRUD operation on webforms and user roles
  */
 function bounce_convert_form_alter(&$form, &$form_state, $form_id) {
-//  drupal_set_message($form_id);
 
   $pos = strpos($form_id, 'webform_client_form_');
   if ($pos !== false) {
@@ -227,20 +277,27 @@ function bounce_convert_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
- * Implementation of hook_init().
+ * hook_page_build().
  */
-function bounce_convert_init() {
+function bounce_convert_page_build(&$page) {
   global $user;
   list ($bounce_convert_webform_id, $bounce_convert_cookie_expiry) = bounce_convert_check_campaigns($user->roles);
   if ($bounce_convert_webform_id) {
+    global $base_url;
     $bounce_convert_js_param = array(
       'webform_id' => $bounce_convert_webform_id,
-      'cookie_expiry' => $bounce_convert_cookie_expiry
+      'cookie_expiry' => $bounce_convert_cookie_expiry,
     );
-    global $base_url;
+    // modal link (display:none)
+    $extracontent = '<a class="ctools-use-modal ctools-modal-modal-popup-medium" style="display:none;" href="' . $base_url . '/modal_forms/nojs/webform/' . $bounce_convert_webform_id . '">Campaign</a>';
+
+    // content region.
+    $page['content']['bounce_convert_modal'] = array(
+      '#markup' => t($extracontent),
+      '#weight' => 25,
+    );
 
     drupal_add_js(array('bounce_convert' => $bounce_convert_js_param), 'setting');
-    drupal_set_message(t('<a class="ctools-use-modal ctools-modal-modal-popup-medium" style="display:none;" href="' . $base_url . '/modal_forms/nojs/webform/' . $bounce_convert_webform_id . '">&nbsp;Link to click</a>'), '', FALSE);
     drupal_add_js(drupal_get_path('module', 'bounce_convert') . '/js/bounce_convert.js');
   }
 }
@@ -275,6 +332,7 @@ function bounce_convert_views_default_views() {
   $handler->display->display_options['title'] = 'Bounce Convert Campaigns';
   $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['access']['perm'] = 'administer content types';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
@@ -310,13 +368,21 @@ function bounce_convert_views_default_views() {
       'empty_column' => 0,
     ),
   );
+  /* Header: Global: Text area */
+  $handler->display->display_options['header']['area']['id'] = 'area';
+  $handler->display->display_options['header']['area']['table'] = 'views';
+  $handler->display->display_options['header']['area']['field'] = 'area';
+  $handler->display->display_options['header']['area']['label'] = 'Add new campaign';
+  $handler->display->display_options['header']['area']['empty'] = TRUE;
+  $handler->display->display_options['header']['area']['content'] = '<a href="' . base_path() . 'node/add/bounce-convert-campaign" alt="Add Campaign" title"Add Campaign">Add New Campaign</a>';
+  $handler->display->display_options['header']['area']['format'] = 'filtered_html';
   /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
   $handler->display->display_options['empty']['area']['label'] = 'No result found';
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area']['content'] = 'No record found.';
+  $handler->display->display_options['empty']['area']['content'] = 'There are currently no campaign on your site. Create a <a href="' . base_path() . 'node/add/bounce-convert-campaign" alt="Add Campaign" title"Add Campaign">Bounce Convert Campaign</a> piece of content.';
   $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
   /* Field: Content: Select webform */
   $handler->display->display_options['fields']['field_bcc_select_webform']['id'] = 'field_bcc_select_webform';
@@ -334,7 +400,7 @@ function bounce_convert_views_default_views() {
   $handler->display->display_options['fields']['title']['field'] = 'title';
   $handler->display->display_options['fields']['title']['label'] = 'Name';
   $handler->display->display_options['fields']['title']['alter']['make_link'] = TRUE;
-  $handler->display->display_options['fields']['title']['alter']['path'] = 'bounce_convert/[field_bcc_select_webform]/results';
+  $handler->display->display_options['fields']['title']['alter']['path'] = 'bounce-convert/[field_bcc_select_webform]/results';
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['title']['link_to_node'] = FALSE;
@@ -394,7 +460,69 @@ function bounce_convert_views_default_views() {
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
-  $handler->display->display_options['path'] = 'bounce-convert-campaigns';
+  $handler->display->display_options['path'] = 'admin/content/campaign';
+
+  $views[$view->name] = $view;
+//  *******************************************************************************************
+
+  $view = new view();
+  $view->name = 'bounce_convert_report_chart';
+  $view->description = '';
+  $view->tag = 'default';
+  $view->base_table = 'bounce_convert_impressions';
+  $view->human_name = 'Bounce Convert Report Chart';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'Bounce Convert Report Chart';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'none';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '10';
+  $handler->display->display_options['style_plugin'] = 'chart';
+  $handler->display->display_options['style_options']['type'] = 'line';
+  $handler->display->display_options['style_options']['library'] = '';
+  $handler->display->display_options['style_options']['label_field'] = 'timestamp';
+  $handler->display->display_options['style_options']['data_fields'] = array(
+    'conversion' => 'conversion',
+    'impression' => 'impression',
+    'timestamp' => 'timestamp',
+  );
+  $handler->display->display_options['style_options']['field_colors'] = array(
+    'conversion' => '#2f7ed8',
+    'impression' => '#0d233a',
+    'timestamp' => '#8bbc21',
+  );
+  $handler->display->display_options['style_options']['width'] = '';
+  $handler->display->display_options['style_options']['height'] = '';
+  $handler->display->display_options['style_options']['xaxis_labels_rotation'] = '0';
+  $handler->display->display_options['style_options']['yaxis_decimal_count'] = '0';
+  $handler->display->display_options['style_options']['yaxis_labels_rotation'] = '0';
+  /* Field: Impressions/Conversions: Conversion Status */
+  $handler->display->display_options['fields']['conversion']['id'] = 'conversion';
+  $handler->display->display_options['fields']['conversion']['table'] = 'bounce_convert_impressions';
+  $handler->display->display_options['fields']['conversion']['field'] = 'conversion';
+  $handler->display->display_options['fields']['conversion']['label'] = 'Conversion';
+  /* Field: Impressions/Conversions: Impression Status */
+  $handler->display->display_options['fields']['impression']['id'] = 'impression';
+  $handler->display->display_options['fields']['impression']['table'] = 'bounce_convert_impressions';
+  $handler->display->display_options['fields']['impression']['field'] = 'impression';
+  $handler->display->display_options['fields']['impression']['label'] = 'Impression';
+  /* Field: Impressions/Conversions: Timestamp */
+  $handler->display->display_options['fields']['timestamp']['id'] = 'timestamp';
+  $handler->display->display_options['fields']['timestamp']['table'] = 'bounce_convert_impressions';
+  $handler->display->display_options['fields']['timestamp']['field'] = 'timestamp';
+
+  /* Display: Page */
+  $handler = $view->new_display('page', 'Page', 'page');
+  $handler->display->display_options['path'] = 'bounce-convert-report-chart';
+
 
   $views[$view->name] = $view;
   return $views;
