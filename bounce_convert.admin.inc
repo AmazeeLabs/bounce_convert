@@ -3,7 +3,8 @@
 define('BOUNCE_CONVERT_CONTENT_TYPE', 'bounce_convert_campaign');
 
 /**
- * @return array A list of published webforms
+ * Return all publish webforms
+ * @return array
  */
 function bounce_convert_webforms() {
   $nodes = node_load_multiple(array(), array(
@@ -19,7 +20,9 @@ function bounce_convert_webforms() {
 }
 
 /**
- * @return array A list of published campaign matching user role ids
+ * Return campagins per uesr role type
+ * @param array $user_rids
+ * @return array
  */
 function bounce_convert_check_campaigns($user_rids) {
   //Default value to not show the modal
@@ -28,7 +31,9 @@ function bounce_convert_check_campaigns($user_rids) {
   //get role ids instead of role names
   $user_rids = array_keys($user_rids);
 
-  /* fetch only published and active campagins (ie: status = 1 and active = yes) */
+  /**
+   * fetch only published and active campagins (ie: status = 1 and active = yes) 
+   */
   $query = new EntityFieldQuery;
   $result = $query
       ->entityCondition('entity_type', 'node')
@@ -52,7 +57,8 @@ function bounce_convert_check_campaigns($user_rids) {
       }
 
       /*
-       * If one of two option is selected from (bellow listed pages / except bellow listed pages)
+       * If one of two option is selected from (bellow listed pages / 
+       * except bellow listed pages)
        */
       $bounce_convert_pages_option = field_get_items('node', $node, 'field_bcc_pages_option');
 
@@ -78,7 +84,7 @@ function bounce_convert_check_campaigns($user_rids) {
         $bounce_convert_field_visibility_settings = explode(',', $bounce_convert_field_visibility_settings);
 
 
-//        //atleast one path is set/givin 
+        //atleast one path is set/givin 
         if ($bounce_convert_field_visibility_settings[0]) {
           $bounce_convert_show_moadal = bounce_convert_check_page_path($bounce_convert_field_visibility_settings);
           if ($bounce_convert_show_moadal) {
@@ -108,6 +114,11 @@ function bounce_convert_check_campaigns($user_rids) {
   }
 }
 
+/**
+ * @param object $node
+ * @param array $user_rids
+ * @return boolean
+ */
 function bounce_convert_check_user_role($node, $user_rids) {
   // show to specific user
   if (!empty($node->field_bcc_specific_user_roles)) {
@@ -132,7 +143,9 @@ function bounce_convert_check_user_role($node, $user_rids) {
 }
 
 /**
- * @return boolean, show modal on current page/path or not
+ * Wheater show modal on current page/path or not
+ * @param type $bounce_convert_field_visibility_settings
+ * @return boolean
  */
 function bounce_convert_check_page_path($bounce_convert_field_visibility_settings) {
   if (in_array(current_path(), $bounce_convert_field_visibility_settings)) {
@@ -156,7 +169,7 @@ function bounce_convert_check_page_path($bounce_convert_field_visibility_setting
 }
 
 /**
- * Add custom fields for content type
+ * Add custom fields for content type campaign
  */
 function bounce_convert_add_fields() {
   foreach (bounce_convert_field_default_field_bases() as $field) {
@@ -170,7 +183,7 @@ function bounce_convert_add_fields() {
 }
 
 /**
- * Delete custom fields for content type
+ * Delete custom fields for content type campaign
  */
 function bounce_convert_delete_fields() {
   foreach (array_keys(bounce_convert_field_default_field_bases()) as $field) {
@@ -183,8 +196,314 @@ function bounce_convert_delete_fields() {
 }
 
 /**
- * Insert user conversion data to table
+ * When user submits campaign an entry is made in DB
+ * @param type $form
+ * @param type $form_state
  */
-function bounce_convert_user_conversion() {
-  drupal_set_message("Yahooooooooooooooooooooooo !");
+function bounce_convert_user_conversion(&$form, &$form_state) {
+  $bounce_convert_wid = $form_state['values']['details']['nid'];
+  $bounce_convert_sid = $form_state['values']['details']['sid'];
+  $bounce_convert_id = isset($_SESSION['bounce_convert_impressions_id']) ? $_SESSION['bounce_convert_impressions_id'] : '';
+  // Update existing record with impression ++
+  db_update('bounce_convert_impressions')
+      ->fields(array(
+        'sid' => $bounce_convert_sid,
+        'conversion' => 1,
+      ))
+      ->condition('id', $bounce_convert_id, '=')
+      ->execute();
+}
+
+/**
+ * Return impression/conversion data array from DB
+ * @param string $report_duration
+ * @param string $db_column
+ * @return array
+ */
+function bounce_convert_chart_data($report_duration, $db_column) {
+  $data = '';
+
+  //if any time duration is selected from filter options
+  switch ($report_duration) {
+    case 'today':
+      $y = 6;
+      for ($i = 0; $i <= 23; $i++) {
+        $start_of_the_day = date('Y-m-d h A', mktime($i, 0, 0, date("m"), date("d"), date("Y")));
+        $start_of_the_day_str = strtotime($start_of_the_day);
+        $y = $i + 1;
+        $end_of_the_day = date('Y-m-d h A', mktime($y, 0, 0, date("m"), date("d"), date("Y")));
+        $end_of_the_day_str = strtotime($end_of_the_day);
+
+        $query = db_select('bounce_convert_impressions', 'bci');
+        $query->
+            condition('wid', '1', '=')
+            ->condition($db_column, 1, '=')
+            ->condition('timestamp', $start_of_the_day_str, '>=')
+            ->condition('timestamp', $end_of_the_day_str, '<=')
+            ->addExpression('SUM(' . $db_column . ')', $db_column);
+        $result = $query->execute();
+
+        foreach ($result as $res) {
+          $data[] = isset($res->$db_column) ? (int) $res->$db_column : 0;
+        }
+      }
+      return $data;
+      break;
+    case 'yesterday':
+      $y = 6;
+      for ($i = 0; $i <= 23; $i++) {
+        $start_of_the_day = date('Y-m-d h A', mktime($i, 0, 0, date("m"), date("d") - 1, date("Y")));
+        $start_of_the_day_str = strtotime($start_of_the_day);
+        $y = $i + 1;
+        $end_of_the_day = date('Y-m-d h A', mktime($y, 0, 0, date("m"), date("d") - 1, date("Y")));
+        $end_of_the_day_str = strtotime($end_of_the_day);
+
+        $query = db_select('bounce_convert_impressions', 'bci');
+        $query->
+            condition('wid', '1', '=')
+            ->condition($db_column, 1, '=')
+            ->condition('timestamp', $start_of_the_day_str, '>=')
+            ->condition('timestamp', $end_of_the_day_str, '<=')
+            ->addExpression('SUM(' . $db_column . ')', $db_column);
+        $result = $query->execute();
+
+        foreach ($result as $res) {
+          $data[] = isset($res->$db_column) ? (int) $res->$db_column : 0;
+        }
+      }
+      return $data;
+      break;
+    case '7days':
+      $y = 6;
+      for ($i = 6; $i >= 0; $i--) {
+        $start_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), date("d") - $i, date("Y")));
+        $start_of_the_day_str = strtotime($start_of_the_day);
+        $y = $i - 1;
+        $end_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), date("d") - $y, date("Y")));
+        $end_of_the_day_str = strtotime($end_of_the_day);
+
+        $query = db_select('bounce_convert_impressions', 'bci');
+        $query->
+            condition('wid', '1', '=')
+            ->condition($db_column, 1, '=')
+            ->condition('timestamp', $start_of_the_day_str, '>=')
+            ->condition('timestamp', $end_of_the_day_str, '<=')
+            ->addExpression('SUM(' . $db_column . ')', $db_column);
+        $result = $query->execute();
+
+        foreach ($result as $res) {
+          $data[] = isset($res->$db_column) ? (int) $res->$db_column : 0;
+        }
+      }
+      return $data;
+      break;
+    case '30days':
+      for ($i = 30; $i > 0; $i--) {
+        $start_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), date("d") - $i, date("Y")));
+        $start_of_the_day_str = strtotime($start_of_the_day);
+        $y = $i - 1;
+        $end_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), date("d") - $y, date("Y")));
+        $end_of_the_day_str = strtotime($end_of_the_day);
+
+
+
+        $query = db_select('bounce_convert_impressions', 'bci');
+        $query->
+            condition('wid', '1', '=')
+            ->condition($db_column, 1, '=')
+            ->condition('timestamp', $start_of_the_day_str, '>=')
+            ->condition('timestamp', $end_of_the_day_str, '<=')
+            ->addExpression('SUM(' . $db_column . ')', $db_column);
+        $result = $query->execute();
+
+        foreach ($result as $res) {
+          $data[] = isset($res->$db_column) ? (int) $res->$db_column : 0;
+        }
+      }
+      return $data;
+      break;
+    case 'this-month':
+      for ($i = 0; $i < date("d"); $i++) {
+
+        $start_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), $i + 1, date("Y")));
+        $start_of_the_day_str = strtotime($start_of_the_day);
+        $y = $i + 1;
+        $end_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), $y + 1, date("Y")));
+        $end_of_the_day_str = strtotime($end_of_the_day);
+
+        $query = db_select('bounce_convert_impressions', 'bci');
+        $query->
+            condition('wid', '1', '=')
+            ->condition($db_column, 1, '=')
+            ->condition('timestamp', $start_of_the_day_str, '>=')
+            ->condition('timestamp', $end_of_the_day_str, '<=')
+            ->addExpression('SUM(' . $db_column . ')', $db_column);
+        $result = $query->execute();
+
+        foreach ($result as $res) {
+          $data[] = isset($res->$db_column) ? (int) $res->$db_column : 0;
+        }
+      }
+      return $data;
+      break;
+    case 'last-month':
+      $last_month_days = count_last_month_days();
+      for ($i = 0; $i < $last_month_days; $i++) {
+//        $labels[] = t(date('m/d', mktime(0, 0, 0, date("m") - 1, 1 + $i, date("Y"))));
+
+        $start_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m") - 1, $i + 1, date("Y")));
+        $start_of_the_day_str = strtotime($start_of_the_day);
+        $y = $i + 1;
+        $end_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m") - 1, $y + 1, date("Y")));
+        $end_of_the_day_str = strtotime($end_of_the_day);
+
+        $query = db_select('bounce_convert_impressions', 'bci');
+        $query->
+            condition('wid', '1', '=')
+            ->condition($db_column, 1, '=')
+            ->condition('timestamp', $start_of_the_day_str, '>=')
+            ->condition('timestamp', $end_of_the_day_str, '<=')
+            ->addExpression('SUM(' . $db_column . ')', $db_column);
+        $result = $query->execute();
+
+        foreach ($result as $res) {
+          $data[] = isset($res->$db_column) ? (int) $res->$db_column : 0;
+        }
+      }
+      return $data;
+      break;
+    default :
+      for ($i = 6; $i >= 0; $i--) {
+        $start_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), date("d") - $i, date("Y")));
+        $start_of_the_day_str = strtotime($start_of_the_day);
+        $y = $i - 1;
+        $end_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), date("d") - $y, date("Y")));
+        $end_of_the_day_str = strtotime($end_of_the_day);
+
+        $query = db_select('bounce_convert_impressions', 'bci');
+        $query->
+            condition('wid', '1', '=')
+            ->condition($db_column, 1, '=')
+            ->condition('timestamp', $start_of_the_day_str, '>=')
+            ->condition('timestamp', $end_of_the_day_str, '<=')
+            ->addExpression('SUM(' . $db_column . ')', $db_column);
+        $result = $query->execute();
+
+        foreach ($result as $res) {
+          $data[] = isset($res->$db_column) ? (int) $res->$db_column : 0;
+        }
+      }
+      return $data;
+      break;
+  }
+}
+
+/**
+ * @param type $report_duration
+ * @return array contains labels per filter type(ie:for days,Months,hours etc.)
+ */
+function bounce_convert_chart_labels($report_duration) {
+  //if any time duration is selected from filter options
+  $labels = array();
+  switch ($report_duration) {
+    case '7days':
+      for ($i = 6; $i >= 0; $i--) {
+        $labels[] = t(date('m/d', mktime($i, 0, 0, date("m"), date("d") - $i, date("Y"))));
+      }
+      return $labels;
+      break;
+    case 'today':
+      $y = 1;
+      for ($i = 0; $i <= 23; $i++) {
+        if ($y == 3 || $i == 0) {
+          $labels[] = t(date('m/d @ hA', mktime($i, 0, 0, date("m"), date("d"), date("Y"))));
+          $y = 1;
+        }
+        else {
+          $y++;
+          $labels[] = '';
+        }
+      }
+      return $labels;
+      break;
+    case 'yesterday':
+      $y = 1;
+      for ($i = 0; $i <= 23; $i++) {
+        if ($y == 3 || $i == 0) {
+          $labels[] = t(date('m/d @ hA', mktime($i, 0, 0, date("m"), date("d") - 1, date("Y"))));
+          $y = 1;
+        }
+        else {
+          $y++;
+          $labels[] = '';
+        }
+      }
+      return $labels;
+      break;
+    case '30days':
+      $y = 1;
+      for ($i = 0; $i <= 30; $i++) {
+        if ($y == 2 || $i == 0) {
+          $labels[] = t(date('m/d', mktime(0, 0, 0, date("m") - 1, date("d") + $i, date("Y"))));
+          $y = 1;
+        }
+        else {
+          $y++;
+          $labels[] = '';
+        }
+      }
+      return $labels;
+      break;
+    case 'this-month':
+      for ($i = 0; $i < date("d"); $i++) {
+        $labels[] = t(date('m/d', mktime(0, 0, 0, date("m"), $i + 1, date("Y"))));
+      }
+      return $labels;
+      break;
+    case 'last-month':
+      $y = 1;
+      $last_month_days = count_last_month_days();
+      for ($i = 0; $i < $last_month_days; $i++) {
+        if ($y == 2 || $i == 0) {
+          $labels[] = t(date('m/d', mktime(0, 0, 0, date("m") - 1, 1 + $i, date("Y"))));
+          $y = 1;
+        }
+        else {
+          $y++;
+          $labels[] = '';
+        }
+      }
+      return $labels;
+      break;
+    default :
+      for ($i = 6; $i >= 0; $i--) {
+        $labels[] = t(date('m/d', strtotime("-$i days")));
+      }
+      return $labels;
+      break;
+  }
+}
+
+/**
+ * @return int
+ * Total days of last month
+ */
+function count_last_month_days() {
+  if (date("m") == 1 || date("m") == 01 || date("m") == '01') {
+    $last_month_days = cal_days_in_month(CAL_GREGORIAN, date("m"), date("Y"));
+  }
+  else {
+    $last_month_days = cal_days_in_month(CAL_GREGORIAN, date("m") - 1, date("Y") - 1);
+  }
+  return $last_month_days;
+}
+
+/**
+ * @return float
+ * Convertion Percentage
+ * (Conversion/Submission)*100
+ */
+function bounce_convert_overall_percentage($bounce_convert_total_conversion, $bounce_convert_total_impression) {
+  $total_percentage = ($bounce_convert_total_conversion / $bounce_convert_total_impression) * 100;
+  return number_format($total_percentage, 2);
 }

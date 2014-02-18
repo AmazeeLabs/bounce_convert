@@ -1,22 +1,3 @@
-//jQuery(document).ready(function() {
-//    jQuery("body").mouseleave(function() {
-//        var visited = jQuery.cookie('bounce_convert_cookie');
-//        if (visited === '1') {
-//          return false;
-//        } else {
-//            //@cookie_expiry set value while create bounce convert campaign
-//            var cookie_expiry = Drupal.settings.bounce_convert.cookie_expiry;
-//            //to click the hidden link of modal form
-//            jQuery(".ctools-use-modal-processed").trigger("click");
-//        }
-//        //setting cookie expiry time by (s * ms)
-//        var date = new Date();
-//        date.setTime(date.getTime() + (cookie_expiry * 1000));
-//        jQuery.cookie('bounce_convert_cookie', '1', {expires: date});
-//    });
-//}); 
-
-
 (function() {
     var current_scroll = 0;
     var last_mouse_y = null;
@@ -36,6 +17,8 @@
                         var cookie_expiry = Drupal.settings.bounce_convert.cookie_expiry;
                         //@webform_id webform id related to campaign
                         var webform_id = Drupal.settings.bounce_convert.webform_id;
+                        //@page_path current page path
+                        var page_path = Drupal.settings.bounce_convert.page_path;
                         //to click the hidden link of modal form
                         jQuery(".ctools-use-modal-processed").trigger("click");
                         // Ajax call to register impression
@@ -44,9 +27,10 @@
                             url: Drupal.settings.basePath + "bounce_convert_impression",
                             data: {
                                 wid: webform_id,
+                                page_path: page_path,
                             },
                             success: function(data) {
-//                                alert(data);
+                                //data saved to DB
                             }
                         });
                     }
@@ -59,6 +43,7 @@
                 last_mouse_y = e.pageY;
             });
 })();
+
 function bounce_convert_jumpto(url) {
 
     if (document.form1.jumpmenu.value != "null") {

@@ -10,15 +10,49 @@
  * creating content type and form values.
  */
 /**
- * Load bounce_convert.admin.inc
+ * Load required files for the module
  */
 module_load_include('inc', 'bounce_convert', 'bounce_convert.admin');
+module_load_include('inc', 'webform', 'includes/webform.report');
 
 /**
  * Implements hook_menu().
  */
 function bounce_convert_menu() {
   $items = array();
+  // Campaign submission listing and Reoport
+  $items['bounce-convert/%/results'] = array(
+    'title' => 'Campaign Report',
+    'description' => 'Configure to fit clients needs',
+    'page callback' => 'bounce_convert_get_submissions',
+    'access callback' => 'webform_results_access',
+    'access arguments' => array(1),
+  );
+
+  $items['bounce-convert/%/results/conversion'] = array(
+    'title' => 'Conversion',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => -10,
+    'access arguments' => array(1),
+    'access callback' => 'webform_results_access',
+    'page callback' => 'bounce_convert_get_submissions',
+  );
+
+  $items['bounce-convert/%/results/impression'] = array(
+    'title' => 'Impression',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'bounce_convert_get_submissions',
+    'access callback' => 'webform_results_access',
+    'access arguments' => array(1),
+  );
+  $items['bounce-convert/%/results/percentage'] = array(
+    'title' => 'Percentage',
+    'type' => MENU_LOCAL_TASK,
+    'access callback' => 'webform_results_access',
+    'access arguments' => array(1),
+    'page callback' => 'bounce_convert_get_submissions',
+  );
+
 
   // Campaigns listing.
   $items['admin/content/campaigns'] = array(
@@ -30,16 +64,6 @@ function bounce_convert_menu() {
     'access callback' => true,
   );
 
-  // Campaign submission listing
-  $items['bounce-convert/%/results'] = array(
-    'title' => 'Campaign Report',
-    'page callback' => 'bounce_convert_get_submissions',
-    'access callback' => 'webform_results_access',
-    'access arguments' => array(1),
-    'type' => MENU_CALLBACK,
-    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-  );
-
   $items['bounce_convert_impression'] = array(
     'page callback' => 'bounce_convert_impression_callback',
     'access callback' => true,
@@ -49,40 +73,102 @@ function bounce_convert_menu() {
 }
 
 function bounce_convert_impression_callback() {
-//  $wid = isset($_POST['wid']) ? $_POST['wid'] : '';
-   $wid = filter_input($_POST, 'wid');
+  global $user;
+
+  // $bounce_convert_wid: return webform id value as argument from Ajax call
+  $bounce_convert_wid = isset($_POST['wid']) ? $_POST['wid'] : '';
+  //@bounce_convert_page_path: return current page url as argument from Ajax call
+  $bounce_convert_page_path = isset($_POST['page_path']) ? $_POST['page_path'] : '';
+
+  if ($bounce_convert_wid != '') {
+    //Insert impression value to table
+    $id = db_insert('bounce_convert_impressions')
+        ->fields(array(
+          'wid' => $bounce_convert_wid,
+          'sid' => 0,
+          'uid' => $user->uid,
+          'impression' => 1,
+          'conversion' => 0,
+          'ip_address' => ip_address(),
+          'path' => $bounce_convert_page_path,
+          'timestamp' => time(),
+        ))
+        ->execute();
+    $_SESSION['bounce_convert_impressions_id'] = $id;
+  }
 }
 
-module_load_include('inc', 'webform', 'includes/webform.report');
-
+/**
+ * Show chart and submissions on campaign report page.
+ * @return array
+ */
 function bounce_convert_get_submissions() {
   $output = '';
-  if (is_numeric(arg(1))) {
-    $node = node_load(arg(1));
+  $nid = arg(1);
+  if (arg(0) == 'bounce-convert' && is_numeric($nid)) {
+    $node = node_load(arg($nid));
+    $report_duration = arg(4);
 
-    $view = views_get_view('bounce_convert_report_chart');
-    $view->execute_display();
+    $bounce_convert_total_conversion = array_sum(bounce_convert_chart_data($report_duration, 'conversion'));
+    $bounce_convert_total_impression = array_sum(bounce_convert_chart_data($report_duration, 'impression'));
+    $bounce_convert_percentage = bounce_convert_overall_percentage($bounce_convert_total_conversion, $bounce_convert_total_impression);
 
-    $output .= '<script language="javascript" type="text/javascript" >
-               
-                </script>
-                <form name="form1">
-                <select name="jumpmenu" onChange="bounce_convert_jumpto(document.form1.jumpmenu.options[document.form1.jumpmenu.options.selectedIndex].value)">
-                <option value="http://localhost/drupal7/bounce-convert/1/results/today">Today</option>
-                <option value="http://localhost/drupal7/bounce-convert/1/results/yesterday">Yesterday</option>
-                <option value="http://localhost/drupal7/bounce-convert/1/results/7days">Last 7 Days</option>
-                <option value="http://localhost/drupal7/bounce-convert/1/results/30day">Last 30 Days</option>
-                <option value="http://localhost/drupal7/bounce-convert/1/results/this-month">This Month</option>
-                <option value="http://localhost/drupal7/bounce-convert/1/results/last-month">Last Month</option>
-                </select>
-                </form>';
+    // Chart Properities
+    $chart = array(
+      '#type' => 'chart',
+      '#chart_type' => 'line',
+    );
 
+    // Conversion
+    $chart['conversion'] = array(
+      '#type' => 'chart_data',
+      '#title' => t('Conversions'),
+      '#data' => bounce_convert_chart_data($report_duration, 'conversion'),
+    );
 
+    if (arg(3) == 'impression') {
+      // Impressions
+      $chart['impression'] = array(
+        '#type' => 'chart_data',
+        '#title' => t('Imressions'),
+        '#data' => bounce_convert_chart_data($report_duration, 'impression'),
+      );
+    }
 
-    $output .= $view->render();
+    $chart['xaxis'] = array(
+      '#type' => 'chart_xaxis',
+      '#title' => t('Time Duration'),
+      '#labels' => bounce_convert_chart_labels($report_duration),
+    );
+
+    $bounce_convert_filter_url = '';
+    if (arg(3) == 'impression' || arg(3) == 'percentage' || arg(3) == 'conversion') {
+      $bounce_convert_filter_url = '/' . arg(3);
+    }
+
+    // Filter options from bounce_convert.tpl file
+    $output .= theme('bounce_convert', array('bounce_convert_filter_url' => $bounce_convert_filter_url, 'bounce_convert_percentage' => $bounce_convert_percentage));
+
+    // Render chart
+    if (arg(3) != 'percentage') {
+      $output .= drupal_render($chart);
+    }
     $output .= webform_results_submissions($node, FALSE, '50');
   }
   return $output;
+}
+
+/**
+ * Theme filter option for chart
+ * hook_theme
+ */
+function bounce_convert_theme() {
+  return array(
+    'bounce_convert' => array(
+      'template' => 'bounce_convert',
+      'variables' => array('bounce_convert_filter_url' => NULL, 'bounce_convert_percentage' => NULL),
+    ),
+  );
 }
 
 /**
@@ -117,7 +203,8 @@ function bounce_convert_field_group_info() {
   $export = array();
 
   $field_group = new stdClass();
-  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = FALSE;
   $field_group->api_version = 1;
   $field_group->identifier = 'group_bcc_modal_options|node|bounce_convert|form';
   $field_group->group_name = 'group_bcc_modal_options';
@@ -147,7 +234,8 @@ function bounce_convert_field_group_info() {
   $export['group_bcc_modal_options|node|bounce_convert|form'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = FALSE;
   $field_group->api_version = 1;
   $field_group->identifier = 'group_bcc_pages|node|bounce_convert|form';
   $field_group->group_name = 'group_bcc_pages';
@@ -175,7 +263,8 @@ function bounce_convert_field_group_info() {
   $export['group_bcc_pages|node|bounce_convert|form'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = FALSE;
   $field_group->api_version = 1;
   $field_group->identifier = 'group_bcc_user_roles|node|bounce_convert|form';
   $field_group->group_name = 'group_bcc_user_roles';
@@ -202,7 +291,8 @@ function bounce_convert_field_group_info() {
   $export['group_bcc_user_roles|node|bounce_convert|form'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = FALSE;
   $field_group->api_version = 1;
   $field_group->identifier = 'group_bcc_visibility_settings|node|bounce_convert|form';
   $field_group->group_name = 'group_bcc_visibility_settings';
@@ -287,6 +377,7 @@ function bounce_convert_page_build(&$page) {
     $bounce_convert_js_param = array(
       'webform_id' => $bounce_convert_webform_id,
       'cookie_expiry' => $bounce_convert_cookie_expiry,
+      'page_path' => current_path(),
     );
     // modal link (display:none)
     $extracontent = '<a class="ctools-use-modal ctools-modal-modal-popup-medium" style="display:none;" href="' . $base_url . '/modal_forms/nojs/webform/' . $bounce_convert_webform_id . '">Campaign</a>';
@@ -325,8 +416,8 @@ function bounce_convert_views_default_views() {
   $view->human_name = 'Bounce Convert Campaigns';
   $view->core = 7;
   $view->api_version = '3.0';
-  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
-
+  /* Edit this to true to make a default view disabled initially */
+  $view->disabled = FALSE;
   /* Display: Master */
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'Bounce Convert Campaigns';
@@ -461,69 +552,7 @@ function bounce_convert_views_default_views() {
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
   $handler->display->display_options['path'] = 'admin/content/campaign';
-
   $views[$view->name] = $view;
-//  *******************************************************************************************
 
-  $view = new view();
-  $view->name = 'bounce_convert_report_chart';
-  $view->description = '';
-  $view->tag = 'default';
-  $view->base_table = 'bounce_convert_impressions';
-  $view->human_name = 'Bounce Convert Report Chart';
-  $view->core = 7;
-  $view->api_version = '3.0';
-  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
-
-  /* Display: Master */
-  $handler = $view->new_display('default', 'Master', 'default');
-  $handler->display->display_options['title'] = 'Bounce Convert Report Chart';
-  $handler->display->display_options['use_more_always'] = FALSE;
-  $handler->display->display_options['access']['type'] = 'none';
-  $handler->display->display_options['cache']['type'] = 'none';
-  $handler->display->display_options['query']['type'] = 'views_query';
-  $handler->display->display_options['exposed_form']['type'] = 'basic';
-  $handler->display->display_options['pager']['type'] = 'full';
-  $handler->display->display_options['pager']['options']['items_per_page'] = '10';
-  $handler->display->display_options['style_plugin'] = 'chart';
-  $handler->display->display_options['style_options']['type'] = 'line';
-  $handler->display->display_options['style_options']['library'] = '';
-  $handler->display->display_options['style_options']['label_field'] = 'timestamp';
-  $handler->display->display_options['style_options']['data_fields'] = array(
-    'conversion' => 'conversion',
-    'impression' => 'impression',
-    'timestamp' => 'timestamp',
-  );
-  $handler->display->display_options['style_options']['field_colors'] = array(
-    'conversion' => '#2f7ed8',
-    'impression' => '#0d233a',
-    'timestamp' => '#8bbc21',
-  );
-  $handler->display->display_options['style_options']['width'] = '';
-  $handler->display->display_options['style_options']['height'] = '';
-  $handler->display->display_options['style_options']['xaxis_labels_rotation'] = '0';
-  $handler->display->display_options['style_options']['yaxis_decimal_count'] = '0';
-  $handler->display->display_options['style_options']['yaxis_labels_rotation'] = '0';
-  /* Field: Impressions/Conversions: Conversion Status */
-  $handler->display->display_options['fields']['conversion']['id'] = 'conversion';
-  $handler->display->display_options['fields']['conversion']['table'] = 'bounce_convert_impressions';
-  $handler->display->display_options['fields']['conversion']['field'] = 'conversion';
-  $handler->display->display_options['fields']['conversion']['label'] = 'Conversion';
-  /* Field: Impressions/Conversions: Impression Status */
-  $handler->display->display_options['fields']['impression']['id'] = 'impression';
-  $handler->display->display_options['fields']['impression']['table'] = 'bounce_convert_impressions';
-  $handler->display->display_options['fields']['impression']['field'] = 'impression';
-  $handler->display->display_options['fields']['impression']['label'] = 'Impression';
-  /* Field: Impressions/Conversions: Timestamp */
-  $handler->display->display_options['fields']['timestamp']['id'] = 'timestamp';
-  $handler->display->display_options['fields']['timestamp']['table'] = 'bounce_convert_impressions';
-  $handler->display->display_options['fields']['timestamp']['field'] = 'timestamp';
-
-  /* Display: Page */
-  $handler = $view->new_display('page', 'Page', 'page');
-  $handler->display->display_options['path'] = 'bounce-convert-report-chart';
-
-
-  $views[$view->name] = $view;
   return $views;
 }
