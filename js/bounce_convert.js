@@ -1,4 +1,10 @@
+/**
+ * @file
+ * Handle Bounce Conver modal and cookie for users
+ */
+
 (function() {
+
     var current_scroll = 0;
     var last_mouse_y = null;
     jQuery(document)
@@ -10,7 +16,8 @@
                 var success_val = e.pageY - speed;
                 if (success_val < last_mouse_y && success_val <= current_scroll) {
                     var visited = jQuery.cookie('bounce_convert_cookie');
-                    if (visited === '1') {
+                    // If cookie time is not expired or Modal/Popup is alreay open
+                    if (visited === '1' || jQuery(".popups-container").length > 0) {
                         return false;
                     } else {
                         //@cookie_expiry set value while create bounce convert campaign
@@ -26,7 +33,7 @@
                             type: 'POST',
                             url: Drupal.settings.basePath + "bounce_convert_impression",
                             data: {
-                                wid: webform_id,
+                                nid: webform_id,
                                 page_path: page_path,
                             },
                             success: function(data) {
@@ -44,9 +51,11 @@
             });
 })();
 
-function bounce_convert_jumpto(url) {
-
-    if (document.form1.jumpmenu.value != "null") {
-        document.location.href = url;
-    }
-}
+jQuery(function() {
+    jQuery(".bounce-convert-filter-options").hover(
+            function() {
+                jQuery(".bounce-convert-filter-options ul").show(500);
+            }, function() {
+        jQuery(".bounce-convert-filter-options ul").hide(500);
+    });
+});

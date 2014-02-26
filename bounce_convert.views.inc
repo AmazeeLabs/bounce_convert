@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * @file
+ * Integrate custom table into views
+ *
+ */
+
+/**
  * Implements hook_views_data().
  */
 function bounce_convert_views_data() {
@@ -13,7 +19,14 @@ function bounce_convert_views_data() {
     'help' => t('Bounce Convert contains content for Impressions and Conversions'),
   );
 
-  $data['bounce_convert_impressions']['wid'] = array(
+  /*   * ******************************************************** */
+  $data['node']['table']['join']['bounce_convert_impressions'] = array(
+    'left_field' => 'nid',
+    'field' => 'nid',
+  );
+  /*   * ******************************************************** */
+
+  $data['bounce_convert_impressions']['nid'] = array(
     'title' => t('Webform ID'),
     'help' => t('Webform ID related impression/conversion'),
     'field' => array(
@@ -118,7 +131,8 @@ function bounce_convert_views_data() {
     'help' => t('Timestamp of when the page was visited.'),
     'field' => array(
       'handler' => 'views_handler_field_date',
-      'click sortable' => TRUE,),
+      'click sortable' => TRUE
+    ),
     'filter' => array(
       'handler' => 'views_handler_filter_date',
     ),

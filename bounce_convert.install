@@ -45,7 +45,7 @@ function bounce_convert_schema() {
         'not null' => TRUE,
         'description' => t('Primary Key: Unique accesslog ID.'),
       ),
-      'wid' => array(
+      'nid' => array(
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
