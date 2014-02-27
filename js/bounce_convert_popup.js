@@ -1,6 +1,6 @@
 /**
  * @file
- * Provide the HTML to create the modal dialog.
+ * Javascript related to the main view list.
  */
 Drupal.theme.prototype.BounceConertPopup = function() {
     var html = '';

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @file
+ * Hook_install and Hook_uninstall lives here
+ */
 // Load bounce_convert.admin.inc
 module_load_include('inc', 'bounce_convert', 'bounce_convert.admin');
 
@@ -34,6 +38,9 @@ function bounce_convert_uninstall() {
   field_purge_batch(1000);
 }
 
+/**
+ * Implements hook_schema().
+ */
 function bounce_convert_schema() {
   $schema = array();
 
@@ -45,12 +52,19 @@ function bounce_convert_schema() {
         'not null' => TRUE,
         'description' => t('Primary Key: Unique accesslog ID.'),
       ),
-      'nid' => array(
+      'webform_id' => array(
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
         'default' => 0,
-        'description' => 'Webform nid used for campaign',
+        'description' => 'Webform node ID used for campaign',
+      ),
+      'campaign_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'default' => 0,
+        'description' => 'Campaign node ID',
       ),
       'sid' => array(
         'type' => 'int',

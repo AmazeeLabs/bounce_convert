@@ -11,24 +11,28 @@
  */
 function bounce_convert_views_data() {
   $data = array();
-  $data['bounce_convert_impressions']['table']['group'] = t('Impressions/Conversions');
+  $data['bounce_convert_impressions']['table']['group'] = t('Bounce Convert Campaign');
 
-  $data['bounce_convert_impressions']['table']['base'] = array(
-    'field' => 'id', // This is the identifier field for the table and view.
-    'title' => t('Impressions/Conversions'),
-    'help' => t('Bounce Convert contains content for Impressions and Conversions'),
+  $data['bounce_convert_impressions']['table']['join'] = array(
+    'node' => array(
+      'left_field' => 'nid',
+      'field' => 'campaign_id',
+    ),
   );
 
-  /*   * ******************************************************** */
-  $data['node']['table']['join']['bounce_convert_impressions'] = array(
-    'left_field' => 'nid',
-    'field' => 'nid',
+  $data['bounce_convert_impressions']['campaign_id'] = array(
+    'title' => t('Campaign node ID'),
+    'help' => t('Campaign node ID related impression/conversion'),
+    'relationship' => array(
+      'base' => 'node',
+      'base field' => 'nid',
+      'handler' => 'views_handler_relationship',
+      'skip base' => 'node',
+    ),
   );
-  /*   * ******************************************************** */
-
-  $data['bounce_convert_impressions']['nid'] = array(
-    'title' => t('Webform ID'),
-    'help' => t('Webform ID related impression/conversion'),
+  $data['bounce_convert_impressions']['webform_id'] = array(
+    'title' => t('Webform node ID'),
+    'help' => t('Webform node ID related impression/conversion'),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -42,7 +46,7 @@ function bounce_convert_views_data() {
   );
   $data['bounce_convert_impressions']['sid'] = array(
     'title' => t('Sumbmission ID'),
-    'help' => t('Submission id related impression/conversion'),
+    'help' => t('Submission ID related impression/conversion'),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,

@@ -19,7 +19,6 @@
     background: lightblue;
     border-radius: 10px;
 }
-
 .bounce-convert-filter-title {
     float: left;
     padding: 15px 5px;
@@ -74,10 +73,6 @@
 }
 
 /* Bounce Conver Modal/Popup */
-
-
-//Hide *(Steric) for required fields
-
 .bounce-convert-custom-modal .modal-header{
     min-height: 0!important;
     padding: 0!important;
@@ -113,10 +108,8 @@
 }
 
 .bounce-convert-custom-modal .popups-confirmation-wrapper {
-    /*background: url("../images/thank-you.png") repeat scroll 0 -55px #fff!important;*/
     background: url("../images/thank-you.png") repeat scroll -25px -55px #FFFFFF !important;
     width: 760px!important;
-    /*height: 500px;*/
 }
 
 .bounce-convert-custom-modal .bounce-convert-success-message {
@@ -135,7 +128,6 @@
 }
 
 .bounce-convert-custom-modal {
-    /*background: url("../images/modal-bg.png") repeat scroll 0 0 #fff!important;*/
     border:10px solid #f2508a;
     text-align: center;
     border-radius: 0px!important;
@@ -224,4 +216,13 @@ div.modal-forms-modal-content .popups-container {
 
 .bounce-convert-custom-modal .form-item label {
     display: none!important;
+}
+
+
+#modalContent {
+    /*display: none!important;*/
+}
+
+#modalBackdrop {
+    /*display: none!important;*/
 }

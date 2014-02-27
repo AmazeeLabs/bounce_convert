@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @file
+ * All functions within this file are related to admin
+ */
 define('BOUNCE_CONVERT_CONTENT_TYPE', 'bounce_convert_campaign');
 
 /**
@@ -31,9 +35,7 @@ function bounce_convert_check_campaigns($user_rids) {
   //get role ids instead of role names
   $user_rids = array_keys($user_rids);
 
-  /**
-   * fetch only published and active campagins (ie: status = 1 and active = yes) 
-   */
+  //fetch only published and active campagins (ie: status = 1 and active = yes).
   $query = new EntityFieldQuery;
   $result = $query
       ->entityCondition('entity_type', 'node')
@@ -41,9 +43,7 @@ function bounce_convert_check_campaigns($user_rids) {
       ->fieldCondition('field_bcc_active', 'value', 'Yes', '=')
       ->execute();
 
-  /*
-   * Check if campaign exists
-   */
+  //Check if campaign exists.
   if (!empty($result)) {
     foreach ($result['node'] as $obj_node) {
       $node = node_load($obj_node->nid);
@@ -57,7 +57,7 @@ function bounce_convert_check_campaigns($user_rids) {
       }
 
       /*
-       * If one of two option is selected from (bellow listed pages / 
+       * If one of two option is selected from (bellow listed pages /
        * except bellow listed pages)
        */
       $bounce_convert_pages_option = field_get_items('node', $node, 'field_bcc_pages_option');
@@ -84,39 +84,11 @@ function bounce_convert_check_campaigns($user_rids) {
         $bounce_convert_field_visibility_settings = explode(',', $bounce_convert_field_visibility_settings);
 
 
-        //atleast one path is set/givin 
+        //atleast one path is set/givin
         if ($bounce_convert_field_visibility_settings[0]) {
           $bounce_convert_show_moadal = bounce_convert_check_page_path($bounce_convert_field_visibility_settings);
           if ($bounce_convert_show_moadal) {
-
-            $bounce_convert_webfrom_nid = field_get_items('node', $node, 'field_bcc_select_webform');
-            $bounce_convert_webfrom_nid = $bounce_convert_webfrom_nid[0]['value'];
-
-            $bounce_convert_cookie_expiration = field_get_items('node', $node, 'field_bcc_cookie_expiration');
-            $bounce_convert_cookie_expiration = $bounce_convert_cookie_expiration[0]['value'];
-
-            $field_bcc_background_color = field_get_items('node', $node, 'field_bcc_background_color');
-            $field_bcc_background_color = isset($field_bcc_background_color[0]['value']) ? $field_bcc_background_color[0]['value'] : '#000';
-
-            $field_bcc_background_opacity = field_get_items('node', $node, 'field_bcc_background_opacity');
-            $field_bcc_background_opacity = isset($field_bcc_background_opacity[0]['value']) ? $field_bcc_background_opacity[0]['value'] : 0.5;
-
-            $field_bcc_modal_width = field_get_items('node', $node, 'field_bcc_modal_width');
-            $field_bcc_modal_width = isset($field_bcc_modal_width[0]['value']) ? (int) $field_bcc_modal_width[0]['value'] : 500;
-
-            $field_bcc_modal_height = field_get_items('node', $node, 'field_bcc_modal_height');
-            $field_bcc_modal_height = isset($field_bcc_modal_height[0]['value']) ? (int) $field_bcc_modal_height[0]['value'] : 500;
-
-
-            $data['webform_nid'] = $bounce_convert_webfrom_nid;
-            $data['campaign_visit_cookie'] = $bounce_convert_cookie_expiration;
-
-            $data['modal_bgcolor'] = $field_bcc_background_color;
-            $data['modal_opacity'] = $field_bcc_background_opacity;
-            $data['modal_width'] = $field_bcc_modal_width;
-            $data['modal_height'] = $field_bcc_modal_height;
-
-            return $data;
+            return bounce_convert_get_webform_properties($node);
           }
           else {
             return FALSE;
@@ -124,39 +96,50 @@ function bounce_convert_check_campaigns($user_rids) {
         }
       }
       else {
-
         //show modal on all pages if no specific paths given
-        $bounce_convert_webfrom_nid = field_get_items('node', $node, 'field_bcc_select_webform');
-        $bounce_convert_webfrom_nid = $bounce_convert_webfrom_nid[0]['value'];
-
-        $bounce_convert_cookie_expiration = field_get_items('node', $node, 'field_bcc_cookie_expiration');
-        $bounce_convert_cookie_expiration = $bounce_convert_cookie_expiration[0]['value'];
-
-        $field_bcc_background_color = field_get_items('node', $node, 'field_bcc_background_color');
-        $field_bcc_background_color = isset($field_bcc_background_color[0]['value']) ? $field_bcc_background_color[0]['value'] : '#000';
-
-        $field_bcc_background_opacity = field_get_items('node', $node, 'field_bcc_background_opacity');
-        $field_bcc_background_opacity = isset($field_bcc_background_opacity[0]['value']) ? $field_bcc_background_opacity[0]['value'] : 0.5;
-
-        $field_bcc_modal_width = field_get_items('node', $node, 'field_bcc_modal_width');
-        $field_bcc_modal_width = isset($field_bcc_modal_width[0]['value']) ? (int) $field_bcc_modal_width[0]['value'] : 500;
-
-        $field_bcc_modal_height = field_get_items('node', $node, 'field_bcc_modal_height');
-        $field_bcc_modal_height = isset($field_bcc_modal_height[0]['value']) ? (int) $field_bcc_modal_height[0]['value'] : 500;
-
-
-        $data['webform_nid'] = $bounce_convert_webfrom_nid;
-        $data['campaign_visit_cookie'] = $bounce_convert_cookie_expiration;
-
-        $data['modal_bgcolor'] = $field_bcc_background_color;
-        $data['modal_opacity'] = $field_bcc_background_opacity;
-        $data['modal_width'] = $field_bcc_modal_width;
-        $data['modal_height'] = $field_bcc_modal_height;
-
-        return $data;
+        return bounce_convert_get_webform_properties($node);
       }
     }
   }
+}
+
+/**
+ * Fetch node object properties
+ * @param object $node
+ * @return array
+ */
+function bounce_convert_get_webform_properties($node) {
+  $campaign_node_id = $node->vid;
+
+  $bounce_convert_webfrom_nid = field_get_items('node', $node, 'field_bcc_select_webform');
+  $bounce_convert_webfrom_nid = $bounce_convert_webfrom_nid[0]['value'];
+
+  $bounce_convert_cookie_expiration = field_get_items('node', $node, 'field_bcc_cookie_expiration');
+  $bounce_convert_cookie_expiration = $bounce_convert_cookie_expiration[0]['value'];
+
+  $field_bcc_background_color = field_get_items('node', $node, 'field_bcc_background_color');
+  $field_bcc_background_color = isset($field_bcc_background_color[0]['value']) ? $field_bcc_background_color[0]['value'] : '#000';
+
+  $field_bcc_background_opacity = field_get_items('node', $node, 'field_bcc_background_opacity');
+  $field_bcc_background_opacity = isset($field_bcc_background_opacity[0]['value']) ? $field_bcc_background_opacity[0]['value'] : 0.5;
+
+  $field_bcc_modal_width = field_get_items('node', $node, 'field_bcc_modal_width');
+  $field_bcc_modal_width = isset($field_bcc_modal_width[0]['value']) ? (int) $field_bcc_modal_width[0]['value'] : 800;
+
+  $field_bcc_modal_height = field_get_items('node', $node, 'field_bcc_modal_height');
+  $field_bcc_modal_height = isset($field_bcc_modal_height[0]['value']) ? (int) $field_bcc_modal_height[0]['value'] : 500;
+
+
+  $data['campaign_node_id'] = $campaign_node_id;
+  $data['webform_id'] = $bounce_convert_webfrom_nid;
+  $data['campaign_visit_cookie'] = $bounce_convert_cookie_expiration;
+
+  $data['modal_bgcolor'] = $field_bcc_background_color;
+  $data['modal_opacity'] = $field_bcc_background_opacity;
+  $data['modal_width'] = $field_bcc_modal_width;
+  $data['modal_height'] = $field_bcc_modal_height;
+
+  return $data;
 }
 
 /**
@@ -171,13 +154,13 @@ function bounce_convert_check_user_role($node, $user_rids) {
       $campaign_roles[] = $role['value'];
     }
 
-    // if user role matches campaign role 
+    // if user role matches campaign role.
     $result = array_intersect($campaign_roles, $user_rids);
     if (!empty($result)) {
       return TRUE;
     }
     else {
-      // if user role DOESN'T matches campaign role 
+      // if user role DOESN'T matches campaign role
       return FALSE;
     }
   }
@@ -198,7 +181,7 @@ function bounce_convert_check_page_path($bounce_convert_field_visibility_setting
     return TRUE;
   }
   else {
-    // wild card character path eg. admin/* 
+    // wild card character path eg. admin/*
     foreach ($bounce_convert_field_visibility_settings as $key => $path) {
       $path = $bounce_convert_field_visibility_settings[$key] = str_replace('*', '', $path);
 
@@ -290,7 +273,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
 
         $query = db_select('bounce_convert_impressions', 'bci');
         $query->
-            condition('nid', $nid, '=')
+            condition('webform_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -314,7 +297,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
 
         $query = db_select('bounce_convert_impressions', 'bci');
         $query->
-            condition('nid', $nid, '=')
+            condition('webform_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -338,7 +321,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
 
         $query = db_select('bounce_convert_impressions', 'bci');
         $query->
-            condition('nid', $nid, '=')
+            condition('webform_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -363,7 +346,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
 
         $query = db_select('bounce_convert_impressions', 'bci');
         $query->
-            condition('nid', $nid, '=')
+            condition('webform_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -387,7 +370,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
 
         $query = db_select('bounce_convert_impressions', 'bci');
         $query->
-            condition('nid', $nid, '=')
+            condition('webform_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -403,7 +386,6 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
     case 'last-month':
       $last_month_days = count_last_month_days();
       for ($i = 0; $i < $last_month_days; $i++) {
-//        $labels[] = t(date('m/d', mktime(0, 0, 0, date("m") - 1, 1 + $i, date("Y"))));
 
         $start_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m") - 1, $i + 1, date("Y")));
         $start_of_the_day_str = strtotime($start_of_the_day);
@@ -413,7 +395,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
 
         $query = db_select('bounce_convert_impressions', 'bci');
         $query->
-            condition('nid', $nid, '=')
+            condition('webform_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -436,7 +418,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
 
         $query = db_select('bounce_convert_impressions', 'bci');
         $query->
-            condition('nid', $nid, '=')
+            condition('webform_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
