@@ -228,6 +228,7 @@ function bounce_convert_field_default_field_bases() {
       'allowed_values' => array(
         0 => 'All pages except those listed',
         1 => 'Only the listed pages',
+        2 => 'Pages on which this PHP code returns TRUE (experts only)',
       ),
       'allowed_values_function' => '',
     ),

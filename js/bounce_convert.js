@@ -28,12 +28,11 @@
                         //@campaign_id Campaign ID
                         var campaign_id = Drupal.settings.bounce_convert.campaign_id;
                         //to click the hidden link of modal form
-//                        jQuery(".ctools-use-modal-processed").trigger("click");
-//                        alert("sdf");
-                        jQuery("#modalContent").css("display", "block");
-                        jQuery("#modalBackdrop").css("display", "block");
-                        jQuery("#modalContent").show();
-                        jQuery("#modalBackdrop").show();
+                        jQuery(".ctools-use-modal-processed").trigger("click");
+//                        jQuery("#modalContent").css("display", "block");
+//                        jQuery("#modalBackdrop").css("display", "block");
+//                        jQuery("#modalContent").show();
+//                        jQuery("#modalBackdrop").show();
                         // Ajax call to register impression
                         jQuery.ajax({
                             type: 'POST',
@@ -59,8 +58,6 @@
 })();
 
 jQuery(function() {
-    jQuery(".ctools-use-modal-processed").trigger("click");
-
     jQuery(".bounce-convert-filter-options").hover(
             function() {
                 jQuery(".bounce-convert-filter-options ul").show(500);

@@ -272,7 +272,7 @@ function bounce_convert_field_default_field_instances() {
     ),
     'entity_type' => 'node',
     'field_name' => 'field_bcc_pages_list',
-    'label' => $t('Show block on specific pages'),
+    'label' => $t(''),
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -312,8 +312,8 @@ function bounce_convert_field_default_field_instances() {
     ),
     'entity_type' => 'node',
     'field_name' => 'field_bcc_pages_option',
-    'label' => $t('All pages except those listed'),
-    'required' => 0,
+    'label' => $t('Show campaign on specific pages'),
+    'required' => 1,
     'settings' => array(
       'user_register_form' => FALSE,
     ),

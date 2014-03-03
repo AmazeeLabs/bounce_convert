@@ -46,7 +46,9 @@ function bounce_convert_check_campaigns($user_rids) {
   //Check if campaign exists.
   if (!empty($result)) {
     foreach ($result['node'] as $obj_node) {
-      $node = node_load($obj_node->nid);
+      $node = node_load($obj_node->vid);
+
+
 
       /*
        * Filter campaigns by user role
@@ -57,50 +59,70 @@ function bounce_convert_check_campaigns($user_rids) {
       }
 
       /*
-       * If one of two option is selected from (bellow listed pages /
-       * except bellow listed pages)
+       * Check for: User selected option from bellow options:
+       * 0 - show modal on all pages except bellow
+       * 1 - show modal only on bellow listed pages
+       * 2 - show modal only if PHP returns TRUE
+       * NULL - mean show on all pages (site wide)
        */
       $bounce_convert_pages_option = field_get_items('node', $node, 'field_bcc_pages_option');
 
 
-      // show only on user given paths/pages
+      // Check if not NULL, at least one option is selected
       if (!empty($bounce_convert_pages_option)) {
-
-        /*
-         * Weather show modal on all pages except bellow (0)
-         * or
-         * show modal only bellow listed pages (1)
-         */
+        // Get user selected option
         $bounce_convert_pages_option = $bounce_convert_pages_option[0]['value'];
 
+        // Fetch path list
+        $paths = bounce_convert_path_list($node, $bounce_convert_pages_option);
 
-        /*
-         * List of pages by using their paths. Entered one path per line by admin.
-         * Creating array of path by preg_replace and explode.
-         */
-        $bounce_convert_field_visibility_settings = field_get_items('node', $node, 'field_bcc_pages_list');
-        $bounce_convert_field_visibility_settings = $bounce_convert_field_visibility_settings[0]['value'];
-        $bounce_convert_field_visibility_settings = preg_replace('#\s+#', ',', trim($bounce_convert_field_visibility_settings));
-        $bounce_convert_field_visibility_settings = explode(',', $bounce_convert_field_visibility_settings);
-
-
-        //atleast one path is set/givin
-        if ($bounce_convert_field_visibility_settings[0]) {
-          $bounce_convert_show_moadal = bounce_convert_check_page_path($bounce_convert_field_visibility_settings);
-          if ($bounce_convert_show_moadal) {
-            return bounce_convert_get_webform_properties($node);
-          }
-          else {
-            return FALSE;
-          }
+        $bounce_convert_show_moadal = bounce_convert_check_page_path($paths, $bounce_convert_pages_option);
+        if ($bounce_convert_show_moadal) {
+          $properties = bounce_convert_get_webform_properties($node);
+          return $properties;
+        }
+        else {
+          return FALSE;
         }
       }
       else {
-        //show modal on all pages if no specific paths given
+        //show modal on all pages if no option is selected
         return bounce_convert_get_webform_properties($node);
       }
     }
   }
+  return FALSE;
+}
+
+/**
+ * Return paths
+ * @param object $node
+ * @return array
+ */
+function bounce_convert_path_list($node, $bounce_convert_pages_option) {
+
+  $bounc_convert_paths = array();
+
+  /*
+   * List of pages by using their paths. Entered one path per line by admin.
+   * Creating array of path by preg_replace and explode.
+   */
+  if (!empty($node->field_bcc_pages_list)) {
+    // If not PHP code Evaluate then Create array of paths.
+    if ($bounce_convert_pages_option != 2) {
+      $bounce_convert_field_visibility_settings = field_get_items('node', $node, 'field_bcc_pages_list');
+      $bounce_convert_field_visibility_settings = $bounce_convert_field_visibility_settings[0]['safe_value'];
+
+      $bounce_convert_field_visibility_settings = preg_replace('#\s+#', ',', trim($bounce_convert_field_visibility_settings));
+      $bounc_convert_paths = explode(',', $bounce_convert_field_visibility_settings);
+    }
+    else {
+      // Return PHP code as it is
+      $bounce_convert_field_visibility_settings = field_get_items('node', $node, 'field_bcc_pages_list');
+      $bounc_convert_paths = $bounce_convert_field_visibility_settings[0]['safe_value'];
+    }
+  }
+  return $bounc_convert_paths;
 }
 
 /**
@@ -148,24 +170,27 @@ function bounce_convert_get_webform_properties($node) {
  * @return boolean
  */
 function bounce_convert_check_user_role($node, $user_rids) {
-  // show to specific user
+  // Check if role is set for campaing
   if (!empty($node->field_bcc_specific_user_roles)) {
+
+    // Get all roles which is set for that particular campaign
     foreach ($node->field_bcc_specific_user_roles['und'] as $role) {
       $campaign_roles[] = $role['value'];
     }
 
-    // if user role matches campaign role.
+    // Check if user role matches campaign role.
     $result = array_intersect($campaign_roles, $user_rids);
+    // If match return TRUE
     if (!empty($result)) {
       return TRUE;
     }
     else {
-      // if user role DOESN'T matches campaign role
+      // if user role DOESN'T matches campaign role return FALSE
       return FALSE;
     }
   }
   else {
-    //show to all users
+    //If no role is set for campaign then show to all roles/users.
     return TRUE;
   }
 }
@@ -175,24 +200,90 @@ function bounce_convert_check_user_role($node, $user_rids) {
  * @param type $bounce_convert_field_visibility_settings
  * @return boolean
  */
-function bounce_convert_check_page_path($bounce_convert_field_visibility_settings) {
-  if (in_array(current_path(), $bounce_convert_field_visibility_settings)) {
-    //exact match eg. admin/modules
+function bounce_convert_check_page_path($paths, $bounce_convert_pages_option) {
+  /*
+   * $bounce_convert_pages_option (0) - All pages except those listed
+   * $bounce_convert_pages_option (1) - Only the listed pages
+   * $bounce_convert_pages_option (2) - PHP code returns TRUE
+   */
+  if (empty($paths) && $bounce_convert_pages_option == 0) {
+    return TRUE;
+  }
+  if (empty($paths) && $bounce_convert_pages_option == 1) {
+    return FALSE;
+  }
+  if (empty($paths) && $bounce_convert_pages_option == 2) {
+    return TRUE;
+  }
+  //PHP code option is selected and code is given
+  if (!empty($paths) && $bounce_convert_pages_option == 2) {
+    return check_php_code($paths);
+  }
+
+  //exact match eg. admin/modules
+  if (in_array(current_path(), $paths)) {
+
+    switch ($bounce_convert_pages_option) {
+      case 0:
+        return FALSE;
+      case 1:
+        return TRUE;
+    }
+  }
+  else {
+
+    // wild card character path eg. admin/*
+    foreach ($paths as $key => $path) {
+      $path = $paths[$key] = str_replace('*', '', $path);
+
+      if (($path == '&lt;front&gt;' || $path == '<front>') && drupal_is_front_page()) {
+        switch ($bounce_convert_pages_option) {
+          case 0:
+            return FALSE;
+          case 1:
+            return TRUE;
+        }
+      }
+
+      if (substr($path, -1) == '/') {
+        $path = substr($path, 0, -1);
+      }
+      $pos = strpos(current_path(), $path);
+      if ($pos !== FALSE) {
+
+        switch ($bounce_convert_pages_option) {
+          case 0:
+            return FALSE;
+          case 1:
+            return TRUE;
+        }
+      }
+      else {
+        switch ($bounce_convert_pages_option) {
+          case 0:
+            return TRUE;
+          case 1:
+            return FALSE;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Evaluate user given PHP code
+ * @param string $code
+ * @return boolean
+ */
+function check_php_code($code) {
+  $code = html_entity_decode($code);
+  $result = php_eval($code);
+
+  if ($result == TRUE) {
     return TRUE;
   }
   else {
-    // wild card character path eg. admin/*
-    foreach ($bounce_convert_field_visibility_settings as $key => $path) {
-      $path = $bounce_convert_field_visibility_settings[$key] = str_replace('*', '', $path);
-
-      $pos = strpos(current_path(), $path);
-      if ($pos !== FALSE) {
-        return TRUE;
-      }
-      else {
-        return FALSE;
-      }
-    }
+    return FALSE;
   }
 }
 

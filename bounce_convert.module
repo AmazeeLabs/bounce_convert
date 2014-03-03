@@ -160,7 +160,7 @@ function bounce_convert_get_submissions() {
 
     // Render chart
     if (arg(3) != 'percentage') {
-//      $output .= drupal_render($chart);
+      $output .= drupal_render($chart);
     }
     $output .= webform_results_submissions($node, FALSE, '50');
   }
@@ -365,6 +365,30 @@ function bounce_convert_form_alter(&$form, &$form_state, $form_id) {
   }
 
 
+  // Remove required option from Pages Path setting
+  if ($form_id == 'bounce_convert_campaign_node_form') {
+    $lang = $form['field_bcc_pages_option']['#language'];
+    $form['field_bcc_pages_option'][$lang]['#required'] = FALSE;
+
+    // Set title for Verticle Tab
+    $form['visibility_title'] = array(
+      '#type' => 'item',
+      '#title' => t('Visibility settings'),
+      '#weight' => 5
+    );
+
+    // Hide PHP option if PHP moduel is not enabled
+    if (!module_exists('php')) {
+      $lang = $form['field_bcc_pages_option']['#language'];
+      unset($form['field_bcc_pages_option'][$lang]['#options'][2]);
+    }
+    else {
+      // Append description for php
+      $form['field_bcc_pages_list']['und'][0]['value']['#description'] = $form['field_bcc_pages_list']['und'][0]['#description'] . ' If the PHP option is chosen, enter PHP code between &lt;?php ?&gt;. Note that executing incorrect PHP code can break your Drupal site.';
+    }
+  }
+
+
   if ($form_id == "bounce_convert_campaign_node_form") {
     //get form field languge for exact match
     $lang = $form['field_bcc_select_webform']['#language'];
@@ -400,8 +424,11 @@ function bounce_convert_page_build(&$page) {
   //Fetch only campaigns that user role has permission for that
   $data = bounce_convert_check_campaigns($user->roles);
 
-  if (!empty($data)) {
+  drupal_add_css(drupal_get_path('module', 'bounce_convert') . '/css/bounce_convert.css');
+  drupal_add_js(drupal_get_path('module', 'bounce_convert') . '/js/bounce_convert.js');
+  drupal_add_js(drupal_get_path('module', 'bounce_convert') . '/js/bounce_convert_popup.js');
 
+  if (!empty($data)) {
     $bounce_convert_campaign_id = $data['campaign_node_id'];
     $bounce_convert_webform_id = $data['webform_id'];
     $bounce_convert_cookie_expiry = $data['campaign_visit_cookie'];
@@ -432,8 +459,6 @@ function bounce_convert_page_build(&$page) {
         ),
         'animation' => 'fadeIn',
         'modalTheme' => 'BounceConertPopup',
-//        'throbber' => $throbber,
-//        'closeText' => t('Close'),
         'closeImage' => theme('image', array('path' => drupal_get_path('module', 'bounce_convert') . '/images/close-button.png', 'alt' => t('Close window'), 'title' => t('Close window')))
       ),
     );
@@ -441,9 +466,6 @@ function bounce_convert_page_build(&$page) {
     drupal_add_js($bounce_conert_popup_setting, 'setting');
 
     drupal_add_js(array('bounce_convert' => $bounce_convert_js_param), 'setting');
-    drupal_add_css(drupal_get_path('module', 'bounce_convert') . '/css/bounce_convert.css');
-    drupal_add_js(drupal_get_path('module', 'bounce_convert') . '/js/bounce_convert.js');
-    drupal_add_js(drupal_get_path('module', 'bounce_convert') . '/js/bounce_convert_popup.js');
     // modal link (display:none)
     $extracontent = '<a class="ctools-use-modal ctools-modal-bounce-conert-style ctools-modal-modal-popup-medium" style="display:none;" href="' . $base_url . '/modal_forms/nojs/webform/' . $bounce_convert_webform_id . '">Campaign</a>';
 
