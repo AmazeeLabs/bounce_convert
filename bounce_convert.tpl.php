@@ -37,8 +37,8 @@
     </a>
 
     <div class="bounce-convert-tab bounce-convert-percentage">
-      <div class="conversion-digit"><?php print $bounce_convert_percentage ?> %</div>
-      <div class="conversion-title">Percentage</div>
+      <div class="conversion-digit"><?php print $bounce_convert_percentage ?></div>
+      <div class="conversion-title">%</div>
     </div>
 
   </div><!--bounce-convert-tabs-wrapper-->

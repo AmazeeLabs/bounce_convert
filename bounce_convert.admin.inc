@@ -46,7 +46,7 @@ function bounce_convert_check_campaigns($user_rids) {
   //Check if campaign exists.
   if (!empty($result)) {
     foreach ($result['node'] as $obj_node) {
-      $node = node_load($obj_node->vid);
+      $node = node_load($obj_node->nid, $obj_node->vid);
 
 
 
@@ -322,7 +322,9 @@ function bounce_convert_delete_fields() {
 function bounce_convert_user_conversion(&$form, &$form_state) {
   $bounce_convert_nid = $form_state['values']['details']['nid'];
   $bounce_convert_sid = $form_state['values']['details']['sid'];
-  $bounce_convert_id = isset($_SESSION['bounce_convert_impressions_id']) ? $_SESSION['bounce_convert_impressions_id'] : '';
+  $ip_address = ip_address();
+  $bounce_convert_id = db_query("SELECT MAX(id) FROM {bounce_convert_impressions} WHERE webform_id = :webform_id AND ip_address = :ip_address", array(':webform_id' => $bounce_convert_nid, ':ip_address' => $ip_address))->fetchField();
+
   // Update existing record with impression ++
   db_update('bounce_convert_impressions')
       ->fields(array(

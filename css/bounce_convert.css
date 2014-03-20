@@ -3,6 +3,7 @@
     width: 170px;
     z-index: 9999;
     position: relative;
+    margin: 15px 0px 0px 0px
 }
 .bounce-convert-filter-options ul a {
     text-decoration: none;
@@ -17,7 +18,7 @@
     text-align: left;
     padding: 8px;
     background: lightblue;
-    border-radius: 10px;
+    border-radius: 7px;
 }
 .bounce-convert-filter-title {
     float: left;
@@ -27,9 +28,11 @@
     border-left: 1px solid #FFFFFF;
     float: right;
     padding: 10px;
-    position: relative;
+    /*position: relative;*/
+    position: absolute;
     text-align: left;
     z-index: 2147483647;
+    right: 15px;
 }
 .bounce-convert-filter-bar{
     height: 50px;
@@ -51,7 +54,7 @@
     color: #fff;
 }
 .bounce-convert-tab .conversion-digit{
-    font-size: 75px;
+    font-size: 70px;
 }
 .bounce-convert-tab .conversion-title{
     font-size: 25px;
@@ -83,7 +86,7 @@
     color: #ee504d;
     font-size: 40px;
     height: 130px;
-    margin: -12px 0 0 255px;
+    margin: -15px 0 0 235px;
     position: absolute;
     text-align: center;
     width: 300px;
@@ -98,7 +101,7 @@
     border:1px solid #e0e0e0 !important;
     border-radius: 0 0 5px 5px;
     opacity: 0.85;
-    padding: 20px 5px;
+    padding: 5px;
     /*-webkit-transition:0.8s all ease-in-out;*/
 }
 
@@ -137,7 +140,7 @@
     background: url("../images/close-button.png") no-repeat scroll 0px -2px rgba(0, 0, 0, 0) !important;
     height: 42px !important;
     margin-left: -13px;
-    margin-top: -30px !important;
+    margin-top: -40px !important;
     position: absolute !important;
     width: 52px !important;
 }
@@ -150,6 +153,10 @@ div.modal-forms-modal-content .popups-container {
     text-align: right!important;
 }
 
+.bounce-convert-custom-modal input[type="submit"]:hover { 
+    color: #fff;
+    border: 1px solid #fff;
+}
 .bounce-convert-custom-modal input[type="submit"] { 
     position: relative;
     color: white;
@@ -174,7 +181,7 @@ div.modal-forms-modal-content .popups-container {
     cursor: pointer;
     font-family: Verdana, Helvetica Nueue, Helvetica, Arial, Times, sans-serif;
     float: left;
-    margin-top: -10px;
+    margin-top: 0px;
 }
 
 .bounce-convert-custom-modal .ajax-progress-throbber {
@@ -213,16 +220,19 @@ div.modal-forms-modal-content .popups-container {
     float: left;
 }
 
-
+/* Hide modal textfield label */
 .bounce-convert-custom-modal .form-item label {
     display: none!important;
 }
 
-
-#modalContent {
-    /*display: none!important;*/
+/* Campaign search form. */
+.bounce-convert-campaign-filter-form #campaign {
+    border: 1px solid #9e9e9e;
+    font-size: 12px;
+    width: 272px;
+    padding: 5px;
 }
-
-#modalBackdrop {
-    /*display: none!important;*/
+.bounce-convert-campaign-filter-form input[type="submit"] {
+    padding: 5px;
+    width: 70px;
 }
