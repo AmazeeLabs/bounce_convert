@@ -471,7 +471,7 @@ function bounce_convert_page_build(&$page) {
 
     drupal_add_js(array('bounce_convert' => $bounce_convert_js_param), 'setting');
     // modal link (display:none)
-    $extracontent = '<a class="bounce-convert-modal-link ctools-use-modal ctools-modal-bounce-conert-style ctools-modal-modal-popup-medium" style="display:none;" href="' . $base_url . '/modal_forms/nojs/webform/' . $bounce_convert_webform_id . '">Campaign</a>';
+    $extracontent = '<a class="bounce-convert-modal-link ctools-use-modal ctools-modal-bounce-conert-style ctools-modal-modal-popup-medium" style="display:none;" href="' . $base_url . '/modal_forms/nojs/webform/' . $bounce_convert_webform_id . '" rel="nofollow">Campaign</a>';
 
     // Add link to content region.and trigger click event on browser exit
     $page[
