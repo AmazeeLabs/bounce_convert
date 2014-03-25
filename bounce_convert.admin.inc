@@ -333,15 +333,6 @@ function bounce_convert_user_conversion(&$form, &$form_state) {
       ))
       ->condition('id', $bounce_convert_id, '=')
       ->execute();
-
-
-  $confirm_message = array("#markup" => '<div class="bounce-convert-success-message">If you do not receive the email within two days,<br>please contact us at <a href="mailto:support@pixelscrapper.com">support@pixelscrapper.com</a></div>');
-  $confirmation['#markup'] = '<div class="popups-confirmation-wrapper">' . drupal_render($confirm_message) . '</div>';
-  $output = array(); // Recreate output
-  // Oerwrite the form output if it was successful.
-  $output[] = ctools_modal_command_display('Confirmation', $confirmation);
-  print ajax_render($output);
-  exit;
 }
 
 /**

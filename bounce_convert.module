@@ -361,8 +361,6 @@ function bounce_convert_form_alter(&$form, &$form_state, $form_id) {
           $form['submitted'][$key]['#attributes'] = array('placeholder' => $value['#title']);
         }
       }
-      // Update Submit button value/text
-      $form['actions']['submit']['#value'] = "Get Your FREE Kit";
       // Custom funtion to make entry into cutom table
       $form['#submit'][] = 'bounce_convert_user_conversion';
     }
