@@ -19,41 +19,43 @@ module_load_include('inc', 'webform', 'includes/webform.report');
 function bounce_convert_menu() {
   $items = array();
   // Campaign submission listing and Reoport
-  $items['bounce-convert/%/results'] = array(
+  $items['admin/reports/bounce-convert/%/results'] = array(
     'title' => 'Campaign Report',
+    'title callback' => 'bounce_convert_campaign_report_title',
+    'title arguments' => array(3),
     'description' => 'Impression/Conversion and submission report',
     'page callback' => 'bounce_convert_get_submissions',
     'access callback' => 'webform_results_access',
-    'access arguments' => array(1),
+    'access arguments' => array(3),
   );
 
-  $items['bounce-convert/%/results/conversion'] = array(
+  $items['admin/reports/bounce-convert/%/results/conversion'] = array(
     'title' => 'Conversion',
     'type' => MENU_CALLBACK,
     'weight' => -10,
-    'access arguments' => array(1),
+    'access arguments' => array(3),
     'access callback' => 'webform_results_access',
     'page callback' => 'bounce_convert_get_submissions',
   );
 
-  $items['bounce-convert/%/results/impression'] = array(
+  $items['admin/reports/bounce-convert/%/results/impression'] = array(
     'title' => 'Impression',
     'type' => MENU_CALLBACK,
     'page callback' => 'bounce_convert_get_submissions',
     'access callback' => 'webform_results_access',
-    'access arguments' => array(1),
+    'access arguments' => array(3),
   );
-  $items['bounce-convert/%/results/percentage'] = array(
+  $items['admin/reports/bounce-convert/%/results/percentage'] = array(
     'title' => 'Percentage',
     'type' => MENU_CALLBACK,
     'access callback' => 'webform_results_access',
-    'access arguments' => array(1),
+    'access arguments' => array(3),
     'page callback' => 'bounce_convert_get_submissions',
   );
 
   // Campaigns listing.
-  $items['admin/content/campaigns'] = array(
-    'title' => 'Bounce Campaigns',
+  $items['admin/reports/bounce-convert'] = array(
+    'title' => 'Bounce Convert Campaigns',
     'description' => 'View and edit all the available campaigns on your site',
     'page callback' => 'bounce_convert_campaign_list',
     'type' => MENU_NORMAL_ITEM,
@@ -66,6 +68,15 @@ function bounce_convert_menu() {
     'type' => MENU_CALLBACK,
   );
   return $items;
+}
+
+/**
+ * Title callback for campaign report menu.
+ */
+function bounce_convert_campaign_report_title($webform_id) {
+  $campaign_id = _bounce_convert_get_campaign_id_from_webform_id($webform_id);
+  $campaign = node_load($campaign_id);
+  return $campaign->title;
 }
 
 /**
@@ -105,10 +116,10 @@ function bounce_convert_impression_callback() {
  */
 function bounce_convert_get_submissions() {
   $output = '';
-  $nid = arg(1);
-  if (arg(0) == 'bounce-convert' && is_numeric($nid)) {
+  $nid = arg(3);
+  if (is_numeric($nid)) {
     $node = node_load($nid);
-    $report_duration = arg(4);
+    $report_duration = arg(6);
 
     $bounce_convert_total_conversion = array_sum(bounce_convert_chart_data($report_duration, 'conversion', $nid));
     $bounce_convert_total_impression = array_sum(bounce_convert_chart_data($report_duration, 'impression', $nid));
@@ -127,7 +138,7 @@ function bounce_convert_get_submissions() {
       '#data' => bounce_convert_chart_data($report_duration, 'conversion', $nid),
     );
 
-    if (arg(3) == 'impression') {
+    if (arg(5) == 'impression') {
       // Impressions
       $chart['impression'] = array(
         '#type' => 'chart_data',
@@ -143,8 +154,8 @@ function bounce_convert_get_submissions() {
     );
 
     $bounce_convert_filter_url = '/conversion';
-    if (arg(3) == 'impression' || arg(3) == 'percentage' || arg(3) == 'conversion') {
-      $bounce_convert_filter_url = '/' . arg(3);
+    if (arg(5) == 'impression' || arg(5) == 'percentage' || arg(5) == 'conversion') {
+      $bounce_convert_filter_url = '/' . arg(5);
     }
 
     // Filter options from bounce_convert.tpl file
@@ -157,7 +168,7 @@ function bounce_convert_get_submissions() {
     );
 
     // Render chart
-    if (arg(3) != 'percentage') {
+    if (arg(5) != 'percentage') {
       $output .= drupal_render($chart);
     }
     $output .= webform_results_submissions($node, FALSE, '50');
@@ -551,7 +562,7 @@ function bounce_convert_campaign_list() {
       $total_conversions = 0;
     }
 
-    $title = l($data->title, 'bounce-convert/' . $webform_id . '/results');
+    $title = l($data->title, 'admin/reports/bounce-convert/' . $webform_id . '/results');
     if (!$webform_id) {
       $title = $data->title;
     }
@@ -582,4 +593,22 @@ function bounce_convert_campaign_list() {
       ) . theme("pager");
 
   return $output;
+}
+
+/**
+ * Utility function to fetch bounce campaign id from a given webform id.
+ * @param $webform_id
+ *   Webform nid.
+ * @return
+ *   The bounce convert campaign nid, or FALSE if the given webform is not
+ *   associated with a bounce convert campaign.
+ */
+function _bounce_convert_get_campaign_id_from_webform_id($webform_id) {
+  $campaign_id = db_query("SELECT campaign_id FROM {bounce_convert_impressions} WHERE webform_id = :webform_id LIMIT 1", array(':webform_id' => $webform_id), array('target' => 'slave'))->fetchField();
+  if ($campaign_id) {
+    return $campaign_id;
+  }
+  else {
+    return FALSE;
+  }
 }
