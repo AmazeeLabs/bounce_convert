@@ -79,11 +79,6 @@
     background: #0066FF;
 }
 
-/* Hide modal textfield label */
-.bounce-convert-custom-modal .form-item label {
-    display: none!important;
-}
-
 /* Campaign search form. */
 .bounce-convert-campaign-filter-form #campaign {
     border: 1px solid #9e9e9e;

@@ -37,7 +37,7 @@
     </a>
 
     <div class="bounce-convert-tab bounce-convert-percentage">
-      <div class="conversion-digit"><?php print $bounce_convert_percentage ?>%</div>
+      <div class="conversion-digit"><?php print round($bounce_convert_percentage, 1) ?>%</div>
       <div class="conversion-title">Conversion Rate</div>
     </div>
 
