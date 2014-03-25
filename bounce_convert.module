@@ -93,7 +93,7 @@ function bounce_convert_impression_callback() {
           'conversion' => 0,
           'ip_address' => ip_address(),
           'path' => $bounce_convert_page_path,
-          'timestamp' => time(),
+          'timestamp' => REQUEST_TIME,
         ))
         ->execute();
   }
@@ -564,7 +564,7 @@ function bounce_convert_campaign_list() {
       $campagin_status,
       $total_impressions,
       $total_conversions,
-      format_interval((time() - $data->changed), 2) . ' ' . t('ago'),
+      format_interval((REQUEST_TIME - $data->changed), 2) . ' ' . t('ago'),
       l(t('Edit'), 'node/' . $data->nid . "/edit", array('query' => array('destination' => 'admin/reports/bounce-convert'))),
       l(t('Delete'), 'node/' . $data->nid . "/delete", array('query' => array('destination' => 'admin/reports/bounce-convert'))),
     );
