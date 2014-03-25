@@ -55,9 +55,13 @@
 }
 .bounce-convert-tab .conversion-digit{
     font-size: 70px;
+    line-height: 70px;
+    padding: 10px;
 }
 .bounce-convert-tab .conversion-title{
     font-size: 25px;
+    line-height: 25px;
+    padding: 10px;
 }
 .bounce-convert-conversion:hover{
     background:#009933;

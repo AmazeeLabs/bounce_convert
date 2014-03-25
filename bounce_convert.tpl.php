@@ -23,22 +23,22 @@
   <div class="bounce-convert-tabs-wrapper">
 
     <a href="<?php print $base_url; ?>/bounce-convert/<?php print arg(1) ?>/results/conversion">
-      <div class="bounce-convert-tab bounce-convert-conversion">
-        <div class="conversion-digit"><?php print $bounce_convert_conversions; ?></div>
-        <div class="conversion-title">Conversions</div>
-      </div>
-    </a>
-
-    <a href="<?php print $base_url; ?>/bounce-convert/<?php print arg(1) ?>/results/impression">
       <div class="bounce-convert-tab bounce-convert-impression">
         <div class="conversion-digit"><?php print $bounce_convert_impressions; ?></div>
         <div class="conversion-title">Impressions</div>
       </div>
     </a>
 
+    <a href="<?php print $base_url; ?>/admin/bounce-convert/<?php print arg(2) ?>/results/conversion">
+      <div class="bounce-convert-tab bounce-convert-conversion">
+        <div class="conversion-digit"><?php print $bounce_convert_conversions; ?></div>
+        <div class="conversion-title">Conversions</div>
+      </div>
+    </a>
+
     <div class="bounce-convert-tab bounce-convert-percentage">
-      <div class="conversion-digit"><?php print $bounce_convert_percentage ?></div>
-      <div class="conversion-title">%</div>
+      <div class="conversion-digit"><?php print $bounce_convert_percentage ?>%</div>
+      <div class="conversion-title">Conversion Rate</div>
     </div>
 
   </div><!--bounce-convert-tabs-wrapper-->
