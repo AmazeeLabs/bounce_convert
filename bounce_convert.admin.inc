@@ -131,7 +131,7 @@ function bounce_convert_path_list($node, $bounce_convert_pages_option) {
  * @return array
  */
 function bounce_convert_get_webform_properties($node) {
-  $campaign_node_id = $node->vid;
+  $campaign_node_id = $node->nid;
 
   $bounce_convert_webfrom_nid = field_get_items('node', $node, 'field_bcc_select_webform');
   $bounce_convert_webfrom_nid = $bounce_convert_webfrom_nid[0]['value'];
