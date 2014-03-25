@@ -36,7 +36,7 @@
                         // Ajax call to register impression
                         jQuery.ajax({
                             type: 'POST',
-                            url: Drupal.settings.basePath + "bounce_convert_impression",
+                            url: Drupal.settings.basePath + "bounce-convert/ajax/impression",
                             data: {
                                 webform_id: webform_id,
                                 page_path: page_path,

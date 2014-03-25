@@ -51,7 +51,7 @@ function bounce_convert_menu() {
   );
 
   // Ajax callback path.
-  $items['bounce_convert_impression'] = array(
+  $items['bounce-convert/ajax/impression'] = array(
     'page callback' => 'bounce_convert_impression_callback',
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
