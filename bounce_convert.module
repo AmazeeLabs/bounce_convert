@@ -131,14 +131,16 @@ function bounce_convert_get_submissions() {
       '#chart_type' => 'line',
     );
 
-    // Conversion
+    // Conversions
     $chart['conversion'] = array(
       '#type' => 'chart_data',
       '#title' => t('Conversions'),
       '#data' => bounce_convert_chart_data($report_duration, 'conversion', $nid),
     );
 
-    if (arg(5) == 'impression') {
+    // Show impressions data unless we are specifically requesting conversions
+    // only.
+    if (arg(5) != 'conversion') {
       // Impressions
       $chart['impression'] = array(
         '#type' => 'chart_data',
@@ -153,7 +155,7 @@ function bounce_convert_get_submissions() {
       '#labels' => bounce_convert_chart_labels($report_duration),
     );
 
-    $bounce_convert_filter_url = '/conversion';
+    $bounce_convert_filter_url = '/impression';
     if (arg(5) == 'impression' || arg(5) == 'percentage' || arg(5) == 'conversion') {
       $bounce_convert_filter_url = '/' . arg(5);
     }

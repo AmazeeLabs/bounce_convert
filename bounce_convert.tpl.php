@@ -22,7 +22,7 @@
 
   <div class="bounce-convert-tabs-wrapper">
 
-    <a href="<?php print $base_url; ?>/admin/reports/bounce-convert/<?php print arg(3) ?>/results/conversion">
+    <a href="<?php print $base_url; ?>/admin/reports/bounce-convert/<?php print arg(3) ?>/results/impression">
       <div class="bounce-convert-tab bounce-convert-impression">
         <div class="conversion-digit"><?php print $bounce_convert_impressions; ?></div>
         <div class="conversion-title">Impressions</div>
