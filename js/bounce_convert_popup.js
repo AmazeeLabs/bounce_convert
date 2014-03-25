@@ -2,7 +2,7 @@
  * @file
  * Javascript related to the main view list.
  */
-Drupal.theme.prototype.BounceConertPopup = function() {
+Drupal.theme.prototype.BounceConvertPopup = function() {
     var html = '';
 
     html += '<div id="ctools-modal" class="popups-box">';

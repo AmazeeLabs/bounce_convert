@@ -462,7 +462,7 @@ function bounce_convert_page_build(&$page) {
           'background' => $bounce_convert_modal_bgcolor,
         ),
         'animation' => 'fadeIn',
-        'modalTheme' => 'BounceConertPopup',
+        'modalTheme' => 'BounceConvertPopup',
         'closeImage' => theme('image', array('path' => drupal_get_path('module', 'bounce_convert') . '/images/close-button.png', 'alt' => t('Close window'), 'title' => t('Close window')))
       ),
     );
