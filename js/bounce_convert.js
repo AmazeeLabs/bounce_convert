@@ -28,7 +28,7 @@
                         //@campaign_id Campaign ID
                         var campaign_id = Drupal.settings.bounce_convert.campaign_id;
                         //to click the hidden link of modal form
-                        jQuery(".ctools-use-modal-processed").trigger("click");
+                        jQuery(".bounce-convert-modal-link").trigger("click");
 //                        jQuery("#modalContent").css("display", "block");
 //                        jQuery("#modalBackdrop").css("display", "block");
 //                        jQuery("#modalContent").show();
