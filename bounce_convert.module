@@ -21,7 +21,7 @@ function bounce_convert_menu() {
 
   // Campaign report
   $items['admin/reports/bounce-convert/%/results'] = array(
-    'title' => 'Campaign Report',
+    'title' => 'Bounce Convert Campaign Report',
     'title callback' => 'bounce_convert_campaign_report_title',
     'title arguments' => array(3),
     'description' => 'Impression/Conversion and submission report',
@@ -500,7 +500,7 @@ function bounce_convert_campaign_list() {
   global $base_url;
   $output = "";
   // Link to add new campagin
-  $output .= l(t('Add New Campaign'), 'node/add/bounce-convert-campaign', array('query' => array('destination' => 'admin/content/campaigns')));
+  $output .= l(t('Add New Campaign'), 'node/add/bounce-convert-campaign', array('query' => array('destination' => 'admin/reports/bounce-convert')));
   // Search form
   $output .= theme('bounce_convert_campaign_filter', array(
     'path' => $base_url,
@@ -565,8 +565,8 @@ function bounce_convert_campaign_list() {
       $total_impressions,
       $total_conversions,
       format_interval((time() - $data->changed), 2) . ' ' . t('ago'),
-      l(t('Edit'), 'node/' . $data->nid . "/edit", array('query' => array('destination' => 'admin/content/campaigns'))),
-      l(t('Delete'), 'node/' . $data->nid . "/delete", array('query' => array('destination' => 'admin/content/campaigns'))),
+      l(t('Edit'), 'node/' . $data->nid . "/edit", array('query' => array('destination' => 'admin/reports/bounce-convert'))),
+      l(t('Delete'), 'node/' . $data->nid . "/delete", array('query' => array('destination' => 'admin/reports/bounce-convert'))),
     );
   }
 
