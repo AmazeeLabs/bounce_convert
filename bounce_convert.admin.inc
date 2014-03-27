@@ -425,8 +425,6 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         $end_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), date("d") - $y, date("Y")));
         $end_of_the_day_str = strtotime($end_of_the_day);
 
-
-
         $query = db_select('bounce_convert_impressions', 'bci');
         $query->
             condition('campaign_id', $nid, '=')
@@ -562,9 +560,9 @@ function bounce_convert_chart_labels($report_duration) {
       break;
     case '30days':
       $y = 1;
-      for ($i = 0; $i <= 30; $i++) {
+      for ($i = 29; $i >= 0; $i--) {
         if ($y == 2 || $i == 0) {
-          $labels[] = t(date('m/d', mktime(0, 0, 0, date("m") - 1, date("d") + $i, date("Y"))));
+          $labels[] = t(date('m/d', mktime($i, 0, 0, date("m"), date("d") - $i, date("Y"))));
           $y = 1;
         }
         else {
