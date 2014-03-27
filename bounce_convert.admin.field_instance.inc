@@ -52,9 +52,13 @@ function bounce_convert_field_default_field_instances() {
   // Exported field_instance: 'node-bounce_convert-field_bcc_background_color'
   $field_instances['node-bounce_convert-field_bcc_background_color'] = array(
     'bundle' => 'bounce_convert',
-    'default_value' => NULL,
+    'default_value' => array(
+      0 => array(
+        'value' => '#000000',
+      ),
+    ),
     'deleted' => 0,
-    'description' => '',
+    'description' => $t('The color of the background behind the modal. Should be entered in html hex notation (eg \'#000000\').'),
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -73,7 +77,7 @@ function bounce_convert_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_bcc_background_color',
     'label' => $t('Background color'),
-    'required' => 0,
+    'required' => 1,
     'settings' => array(
       'text_processing' => 0,
       'user_register_form' => FALSE,
@@ -85,16 +89,20 @@ function bounce_convert_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 1,
+      'weight' => 3,
     ),
   );
 
   // Exported field_instance: 'node-bounce_convert-field_bcc_background_opacity'
   $field_instances['node-bounce_convert-field_bcc_background_opacity'] = array(
     'bundle' => 'bounce_convert',
-    'default_value' => NULL,
+    'default_value' => array(
+      0 => array(
+        'value' => '0.5',
+      ),
+    ),
     'deleted' => 0,
-    'description' => '',
+    'description' => $t('The opacity of the background behind the modal. Should be entered as a decimal value (eg 0.85 = 85% opacity).'),
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -113,7 +121,7 @@ function bounce_convert_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_bcc_background_opacity',
     'label' => $t('Background opacity'),
-    'required' => 0,
+    'required' => 1,
     'settings' => array(
       'text_processing' => 0,
       'user_register_form' => FALSE,
@@ -125,7 +133,7 @@ function bounce_convert_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 2,
+      'weight' => 4,
     ),
   );
 
@@ -174,7 +182,7 @@ function bounce_convert_field_default_field_instances() {
     'bundle' => 'bounce_convert',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => $t('The height of the modal popup, in pixels.'),
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -193,7 +201,7 @@ function bounce_convert_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_bcc_modal_height',
     'label' => $t('Modal height'),
-    'required' => 0,
+    'required' => 1,
     'settings' => array(
       'text_processing' => 0,
       'user_register_form' => FALSE,
@@ -205,7 +213,7 @@ function bounce_convert_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 3,
+      'weight' => 1,
     ),
   );
 
@@ -214,7 +222,7 @@ function bounce_convert_field_default_field_instances() {
     'bundle' => 'bounce_convert',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => $t('The width of the modal popup, in pixels.'),
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -233,7 +241,7 @@ function bounce_convert_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_bcc_modal_width',
     'label' => $t('Modal width'),
-    'required' => 0,
+    'required' => 1,
     'settings' => array(
       'text_processing' => 0,
       'user_register_form' => FALSE,
@@ -245,7 +253,7 @@ function bounce_convert_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 4,
+      'weight' => 2,
     ),
   );
 
@@ -292,7 +300,11 @@ function bounce_convert_field_default_field_instances() {
   // Exported field_instance: 'node-bounce_convert-field_bcc_pages_option'
   $field_instances['node-bounce_convert-field_bcc_pages_option'] = array(
     'bundle' => 'bounce_convert',
-    'default_value' => NULL,
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -331,7 +343,7 @@ function bounce_convert_field_default_field_instances() {
     'bundle' => 'bounce_convert',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => $t('Select the webform that will be the basis for the campaign.'),
+    'description' => $t('Select the webform that will be the basis for this campaign.'),
     'display' => array(
       'default' => array(
         'label' => 'above',

@@ -16,7 +16,9 @@ function bounce_convert_webforms() {
     'status' => 1,
   ));
   $webforms = array();
-  $webforms[0] = 'Select a value';
+  // @todo: This needs validation callback to make sure the user has selected
+  // a valid weboform, and not left the default '- Select a value -'.
+  $webforms[0] = '- Select a value -';
   foreach ($nodes as $nid => $node) {
     $webforms[$nid] = check_plain($node->title);
   }
