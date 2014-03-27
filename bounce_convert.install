@@ -80,6 +80,15 @@ function bounce_convert_schema() {
         'default' => 0,
         'description' => 'User ID {uid} of current user.',
       ),
+      // @todo: this impression column is needless, and should be removed.
+      // But need to refactor bounce_convert_chart_data().
+      'impression' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'default' => 0,
+        'description' => '1 if this row counts as an impression.',
+      ),
       'conversion' => array(
         'type' => 'int',
         'unsigned' => TRUE,

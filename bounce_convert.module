@@ -89,6 +89,7 @@ function bounce_convert_impression_callback() {
           'campaign_id' => $bounce_convert_campaign_id,
           'sid' => 0,
           'uid' => $user->uid,
+          'impression' => 1,
           'conversion' => 0,
           'ip_address' => ip_address(),
           'path' => $bounce_convert_page_path,
