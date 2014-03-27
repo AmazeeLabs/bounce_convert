@@ -45,54 +45,47 @@ function bounce_convert_schema() {
   $schema = array();
 
   $schema['bounce_convert_impression'] = array(
-    'description' => t('Contains impressions and conversions of submited campaigns'),
+    'description' => 'Stores impressions and conversions of bounce convert campaigns',
     'fields' => array(
       'id' => array(
         'type' => 'serial',
         'not null' => TRUE,
-        'description' => t('Primary Key: Unique accesslog ID.'),
+        'description' => 'Primary Key: Unique impression ID.',
       ),
       'webform_id' => array(
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
         'default' => 0,
-        'description' => 'Webform node ID used for campaign',
+        'description' => 'Webform node ID used for this campaign.',
       ),
       'campaign_id' => array(
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
         'default' => 0,
-        'description' => 'Campaign node ID',
+        'description' => 'Campaign node ID.',
       ),
       'sid' => array(
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
-        'description' => t('Webform submissin ID'),
+        'description' => 'Webform submissin ID.',
       ),
       'uid' => array(
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
         'default' => 0,
-        'description' => 'User ID {uid} of a current user',
-      ),
-      'impression' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => FALSE,
-        'default' => 0,
-        'description' => 'Impression of campaign',
+        'description' => 'User ID {uid} of current user.',
       ),
       'conversion' => array(
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
         'default' => 0,
-        'description' => 'Conversion of campaign',
+        'description' => '1 if this impression resulted in a conversion.',
       ),
       'ip_address' => array(
         'type' => 'varchar',
@@ -116,9 +109,22 @@ function bounce_convert_schema() {
     ),
     'primary key' => array('id'),
     'indexes' => array(
-      'impression' => array('impression'),
       'conversion' => array('conversion'),
       'sid' => array('sid'),
+    ),
+    'foreign keys' => array(
+      'user_id' => array(
+        'table' => 'users',
+        'columns' => array('uid' => 'uid'),
+      ),
+      'webform_id' => array(
+        'table' => 'webform',
+        'columns' => array('webform_id' => 'nid'),
+      ),
+      'submission_id' => array(
+        'table' => 'webform_submissions',
+        'columns' => array('sid' => 'sid'),
+      ),
     ),
   );
 
