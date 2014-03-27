@@ -13,7 +13,7 @@
             .mousemove(function(e) {
                 var speed = last_mouse_y - e.pageY;
                 var success_val = e.pageY - speed;
-                if (success_val < last_mouse_y && success_val <= current_scroll) {
+                if (success_val < last_mouse_y && success_val <= current_scroll && e.clientY < 120) {
                     var visited = jQuery.cookie('bounce_convert_cookie');
                     // If cookie time is not expired or Modal/Popup is alreay open
                     if (visited === '1' || jQuery(".popups-container").length > 0) {
@@ -28,15 +28,11 @@
                         //@campaign_id Campaign ID
                         var campaign_id = Drupal.settings.bounce_convert.campaign_id;
                         //to click the hidden link of modal form
-                        jQuery(".ctools-use-modal-processed").trigger("click");
-//                        jQuery("#modalContent").css("display", "block");
-//                        jQuery("#modalBackdrop").css("display", "block");
-//                        jQuery("#modalContent").show();
-//                        jQuery("#modalBackdrop").show();
+                        jQuery(".bounce-convert-modal-link").trigger("click");
                         // Ajax call to register impression
                         jQuery.ajax({
                             type: 'POST',
-                            url: Drupal.settings.basePath + "bounce_convert_impression",
+                            url: Drupal.settings.basePath + "bounce-convert/ajax/impression",
                             data: {
                                 webform_id: webform_id,
                                 page_path: page_path,

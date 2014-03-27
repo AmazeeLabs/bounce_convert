@@ -131,7 +131,7 @@ function bounce_convert_path_list($node, $bounce_convert_pages_option) {
  * @return array
  */
 function bounce_convert_get_webform_properties($node) {
-  $campaign_node_id = $node->vid;
+  $campaign_node_id = $node->nid;
 
   $bounce_convert_webfrom_nid = field_get_items('node', $node, 'field_bcc_select_webform');
   $bounce_convert_webfrom_nid = $bounce_convert_webfrom_nid[0]['value'];
@@ -333,15 +333,6 @@ function bounce_convert_user_conversion(&$form, &$form_state) {
       ))
       ->condition('id', $bounce_convert_id, '=')
       ->execute();
-
-
-  $confirm_message = array("#markup" => '<div class="bounce-convert-success-message">If you do not receive the email within two days,<br>please contact us at <a href="mailto:support@pixelscrapper.com">support@pixelscrapper.com</a></div>');
-  $confirmation['#markup'] = '<div class="popups-confirmation-wrapper">' . drupal_render($confirm_message) . '</div>';
-  $output = array(); // Recreate output
-  // Oerwrite the form output if it was successful.
-  $output[] = ctools_modal_command_display('Confirmation', $confirmation);
-  print ajax_render($output);
-  exit;
 }
 
 /**
@@ -366,7 +357,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
 
         $query = db_select('bounce_convert_impressions', 'bci');
         $query->
-            condition('webform_id', $nid, '=')
+            condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -390,7 +381,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
 
         $query = db_select('bounce_convert_impressions', 'bci');
         $query->
-            condition('webform_id', $nid, '=')
+            condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -404,8 +395,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
       return $data;
       break;
     case '7days':
-      $y = 6;
-      for ($i = 6; $i >= 0; $i--) {
+      for ($i = 7; $i > 0; $i--) {
         $start_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), date("d") - $i, date("Y")));
         $start_of_the_day_str = strtotime($start_of_the_day);
         $y = $i - 1;
@@ -414,7 +404,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
 
         $query = db_select('bounce_convert_impressions', 'bci');
         $query->
-            condition('webform_id', $nid, '=')
+            condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -439,7 +429,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
 
         $query = db_select('bounce_convert_impressions', 'bci');
         $query->
-            condition('webform_id', $nid, '=')
+            condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -463,7 +453,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
 
         $query = db_select('bounce_convert_impressions', 'bci');
         $query->
-            condition('webform_id', $nid, '=')
+            condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -488,7 +478,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
 
         $query = db_select('bounce_convert_impressions', 'bci');
         $query->
-            condition('webform_id', $nid, '=')
+            condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -502,7 +492,8 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
       return $data;
       break;
     default :
-      for ($i = 6; $i >= 0; $i--) {
+      for ($i = 7; $i > 0; $i--) {
+
         $start_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), date("d") - $i, date("Y")));
         $start_of_the_day_str = strtotime($start_of_the_day);
         $y = $i - 1;
@@ -511,7 +502,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
 
         $query = db_select('bounce_convert_impressions', 'bci');
         $query->
-            condition('webform_id', $nid, '=')
+            condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
