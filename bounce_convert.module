@@ -357,14 +357,6 @@ function bounce_convert_form_alter(&$form, &$form_state, $form_id) {
   $pos = strpos($form_id, 'webform_client_form_');
   if ($pos !== FALSE) {
     if ($form_id == 'webform_client_form_' . $form['#node']->nid) {
-      // Loop through webform fields
-      foreach ($form['submitted'] as $key => $value) {
-        //If type is Textfield
-        if ($value['#type'] == 'textfield') {
-          //Set the title of field as placeholder value
-          $form['submitted'][$key]['#attributes'] = array('placeholder' => $value['#title']);
-        }
-      }
       // Custom funtion to make entry into cutom table
       $form['#submit'][] = 'bounce_convert_user_conversion';
     }
@@ -548,7 +540,7 @@ function bounce_convert_campaign_list() {
 //    FROM bounce_convert_impression
 //    WHERE campaign_id = 35296
 
-    $total_impressions = db_query("SELECT SUM(impression) FROM {bounce_convert_impression} WHERE campaign_id = :nid", array(':nid' => $nid))->fetchField();
+    $total_impressions = db_query("SELECT COUNT(*) FROM {bounce_convert_impression} WHERE campaign_id = :nid", array(':nid' => $nid))->fetchField();
     $total_conversions = db_query("SELECT SUM(conversion) FROM {bounce_convert_impression} WHERE campaign_id = :nid", array(':nid' => $nid))->fetchField();
     $webform_id = db_query("SELECT webform_id FROM {bounce_convert_impression} WHERE campaign_id = :nid", array(':nid' => $nid))->fetchField();
     $campagin_status = db_query("SELECT field_bcc_active_value FROM {field_data_field_bcc_active} WHERE entity_id = :nid AND revision_id = :vid", array(':nid' => $nid, ':vid' => $vid))->fetchField();
