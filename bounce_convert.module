@@ -62,8 +62,7 @@ function bounce_convert_menu() {
 /**
  * Title callback for campaign report menu.
  */
-function bounce_convert_campaign_report_title($webform_id) {
-  $campaign_id = _bounce_convert_get_campaign_id_from_webform_id($webform_id);
+function bounce_convert_campaign_report_title($campaign_id) {
   $campaign = node_load($campaign_id);
   return $campaign->title;
 }
