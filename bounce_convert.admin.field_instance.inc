@@ -326,8 +326,8 @@ function bounce_convert_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-bounce_convert-field_bcc_select_webform'
-  $field_instances['node-bounce_convert-field_bcc_select_webform'] = array(
+  // Exported field_instance: 'node-bounce_convert-field_bcc_webform'
+  $field_instances['node-bounce_convert-field_bcc_webform'] = array(
     'bundle' => 'bounce_convert',
     'default_value' => NULL,
     'deleted' => 0,
@@ -348,7 +348,7 @@ function bounce_convert_field_default_field_instances() {
       ),
     ),
     'entity_type' => 'node',
-    'field_name' => 'field_bcc_select_webform',
+    'field_name' => 'field_bcc_webform',
     'label' => $t('Select webform'),
     'required' => 1,
     'settings' => array(

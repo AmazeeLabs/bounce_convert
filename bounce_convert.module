@@ -164,7 +164,7 @@ function bounce_convert_get_submissions() {
     }
 
     // Render table of webform submissions
-    $webform = node_load($node->field_bcc_select_webform[LANGUAGE_NONE][0]['value']);
+    $webform = node_load($node->field_bcc_webform[LANGUAGE_NONE][0]['value']);
     $output .= webform_results_submissions($webform, FALSE, '50');
   }
   return $output;
@@ -398,15 +398,15 @@ function bounce_convert_form_alter(&$form, &$form_state, $form_id) {
 
   if ($form_id == "bounce_convert_campaign_node_form") {
     //get form field languge for exact match
-    $lang = $form['field_bcc_select_webform']['#language'];
-    $form['field_bcc_select_webform'][$lang]['#options'] = bounce_convert_webforms();
+    $lang = $form['field_bcc_webform']['#language'];
+    $form['field_bcc_webform'][$lang]['#options'] = bounce_convert_webforms();
 
     $form['field_bcc_specific_user_roles'][$lang]['#options'] = user_roles($membersonly = FALSE);
     //if node edit page then set default value
     if (arg(0) == 'node' && arg(2) == 'edit') {
       $node = node_load(arg(1));
-      $field_bcc_select_webform = field_get_items('node', $node, 'field_bcc_select_webform');
-      $form['field_bcc_select_webform'][$lang]['#default_value'] = $field_bcc_select_webform[0]['value'];
+      $field_bcc_webform = field_get_items('node', $node, 'field_bcc_webform');
+      $form['field_bcc_webform'][$lang]['#default_value'] = $field_bcc_webform[0]['value'];
 
       $field_bcc_specific_user_roles = field_get_items('node', $node, 'field_bcc_specific_user_roles');
       if (!empty($field_bcc_specific_user_roles)) {

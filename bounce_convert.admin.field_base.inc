@@ -236,13 +236,13 @@ function bounce_convert_field_default_field_bases() {
     'type' => 'list_text',
   );
 
-  // Exported field_base: 'field_bcc_select_webform'
-  $field_bases['field_bcc_select_webform'] = array(
+  // Exported field_base: 'field_bcc_webform'
+  $field_bases['field_bcc_webform'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
-    'field_name' => 'field_bcc_select_webform',
+    'field_name' => 'field_bcc_webform',
     'foreign keys' => array(),
     'indexes' => array(
       'value' => array(
