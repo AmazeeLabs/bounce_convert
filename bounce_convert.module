@@ -162,7 +162,10 @@ function bounce_convert_get_submissions() {
     if (arg(5) != 'percentage') {
       $output .= drupal_render($chart);
     }
-    $output .= webform_results_submissions($node, FALSE, '50');
+
+    // Render table of webform submissions
+    $webform = node_load($node->field_bcc_select_webform[LANGUAGE_NONE][0]['value']);
+    $output .= webform_results_submissions($webform, FALSE, '50');
   }
   return $output;
 }
