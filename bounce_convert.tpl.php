@@ -8,7 +8,7 @@
  * - $bounce_convert_filter_url: Filter if any applied.
  * - $bounce_convert_percentage: Total Percentage.
  * - $bounce_convert_conversions: Total Conversions.
- * - $bounce_convert_impressions: Total Impressions.
+ * - $bounce_convert_impression: Total Impressions.
  *
  */
 ?>
@@ -24,7 +24,7 @@
 
     <a href="<?php print $base_url; ?>/admin/reports/bounce-convert/<?php print arg(3); ?>/results/impression">
       <div class="bounce-convert-tab bounce-convert-impression">
-        <div class="conversion-digit"><?php print $bounce_convert_impressions; ?></div>
+        <div class="conversion-digit"><?php print $bounce_convert_impression; ?></div>
         <div class="conversion-title">Impressions</div>
       </div>
     </a>

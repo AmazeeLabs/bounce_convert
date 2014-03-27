@@ -323,10 +323,10 @@ function bounce_convert_user_conversion(&$form, &$form_state) {
   $bounce_convert_nid = $form_state['values']['details']['nid'];
   $bounce_convert_sid = $form_state['values']['details']['sid'];
   $ip_address = ip_address();
-  $bounce_convert_id = db_query("SELECT MAX(id) FROM {bounce_convert_impressions} WHERE webform_id = :webform_id AND ip_address = :ip_address", array(':webform_id' => $bounce_convert_nid, ':ip_address' => $ip_address))->fetchField();
+  $bounce_convert_id = db_query("SELECT MAX(id) FROM {bounce_convert_impression} WHERE webform_id = :webform_id AND ip_address = :ip_address", array(':webform_id' => $bounce_convert_nid, ':ip_address' => $ip_address))->fetchField();
 
   // Update existing record with impression ++
-  db_update('bounce_convert_impressions')
+  db_update('bounce_convert_impression')
       ->fields(array(
         'sid' => $bounce_convert_sid,
         'conversion' => 1,
@@ -355,7 +355,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         $end_of_the_day = date('Y-m-d h A', mktime($y, 0, 0, date("m"), date("d"), date("Y")));
         $end_of_the_day_str = strtotime($end_of_the_day);
 
-        $query = db_select('bounce_convert_impressions', 'bci');
+        $query = db_select('bounce_convert_impression', 'bci');
         $query->
             condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
@@ -379,7 +379,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         $end_of_the_day = date('Y-m-d h A', mktime($y, 0, 0, date("m"), date("d") - 1, date("Y")));
         $end_of_the_day_str = strtotime($end_of_the_day);
 
-        $query = db_select('bounce_convert_impressions', 'bci');
+        $query = db_select('bounce_convert_impression', 'bci');
         $query->
             condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
@@ -402,7 +402,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         $end_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), date("d") - $y, date("Y")));
         $end_of_the_day_str = strtotime($end_of_the_day);
 
-        $query = db_select('bounce_convert_impressions', 'bci');
+        $query = db_select('bounce_convert_impression', 'bci');
         $query->
             condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
@@ -425,7 +425,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         $end_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), date("d") - $y, date("Y")));
         $end_of_the_day_str = strtotime($end_of_the_day);
 
-        $query = db_select('bounce_convert_impressions', 'bci');
+        $query = db_select('bounce_convert_impression', 'bci');
         $query->
             condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
@@ -449,7 +449,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         $end_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), $y + 1, date("Y")));
         $end_of_the_day_str = strtotime($end_of_the_day);
 
-        $query = db_select('bounce_convert_impressions', 'bci');
+        $query = db_select('bounce_convert_impression', 'bci');
         $query->
             condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
@@ -474,7 +474,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         $end_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m") - 1, $y + 1, date("Y")));
         $end_of_the_day_str = strtotime($end_of_the_day);
 
-        $query = db_select('bounce_convert_impressions', 'bci');
+        $query = db_select('bounce_convert_impression', 'bci');
         $query->
             condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
@@ -498,7 +498,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         $end_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), date("d") - $y, date("Y")));
         $end_of_the_day_str = strtotime($end_of_the_day);
 
-        $query = db_select('bounce_convert_impressions', 'bci');
+        $query = db_select('bounce_convert_impression', 'bci');
         $query->
             condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')

@@ -44,7 +44,7 @@ function bounce_convert_uninstall() {
 function bounce_convert_schema() {
   $schema = array();
 
-  $schema['bounce_convert_impressions'] = array(
+  $schema['bounce_convert_impression'] = array(
     'description' => t('Contains impressions and conversions of submited campaigns'),
     'fields' => array(
       'id' => array(

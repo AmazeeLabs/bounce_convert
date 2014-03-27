@@ -11,16 +11,16 @@
  */
 function bounce_convert_views_data() {
   $data = array();
-  $data['bounce_convert_impressions']['table']['group'] = t('Bounce Convert Campaign');
+  $data['bounce_convert_impression']['table']['group'] = t('Bounce Convert Campaign');
 
-  $data['bounce_convert_impressions']['table']['join'] = array(
+  $data['bounce_convert_impression']['table']['join'] = array(
     'node' => array(
       'left_field' => 'nid',
       'field' => 'campaign_id',
     ),
   );
 
-  $data['bounce_convert_impressions']['campaign_id'] = array(
+  $data['bounce_convert_impression']['campaign_id'] = array(
     'title' => t('Campaign node ID'),
     'help' => t('Campaign node ID related impression/conversion'),
     'relationship' => array(
@@ -30,7 +30,7 @@ function bounce_convert_views_data() {
       'skip base' => 'node',
     ),
   );
-  $data['bounce_convert_impressions']['webform_id'] = array(
+  $data['bounce_convert_impression']['webform_id'] = array(
     'title' => t('Webform node ID'),
     'help' => t('Webform node ID related impression/conversion'),
     'field' => array(
@@ -44,7 +44,7 @@ function bounce_convert_views_data() {
       'handler' => 'views_handler_sort',
     ),
   );
-  $data['bounce_convert_impressions']['sid'] = array(
+  $data['bounce_convert_impression']['sid'] = array(
     'title' => t('Sumbmission ID'),
     'help' => t('Submission ID related impression/conversion'),
     'field' => array(
@@ -59,7 +59,7 @@ function bounce_convert_views_data() {
     ),
   );
 
-  $data['bounce_convert_impressions']['uid'] = array(
+  $data['bounce_convert_impression']['uid'] = array(
     'title' => t('User ID'),
     'help' => t('User ID {uid} of a user for impression/conversion'),
     'field' => array(
@@ -73,7 +73,7 @@ function bounce_convert_views_data() {
       'handler' => 'views_handler_sort',
     ),
   );
-  $data['bounce_convert_impressions']['impression'] = array(
+  $data['bounce_convert_impression']['impression'] = array(
     'title' => t('Impression Status'),
     'help' => t('Impression status for tracking record'),
     'field' => array(
@@ -87,7 +87,7 @@ function bounce_convert_views_data() {
       'handler' => 'views_handler_sort',
     ),
   );
-  $data['bounce_convert_impressions']['conversion'] = array(
+  $data['bounce_convert_impression']['conversion'] = array(
     'title' => t('Conversion Status'),
     'help' => t('Conversion status whether convert or not'),
     'field' => array(
@@ -101,7 +101,7 @@ function bounce_convert_views_data() {
       'handler' => 'views_handler_sort',
     ),
   );
-  $data['bounce_convert_impressions']['ip_address'] = array(
+  $data['bounce_convert_impression']['ip_address'] = array(
     'title' => t('IP address of a user who visit the page.'),
     'help' => t('Conversion'),
     'field' => array(
@@ -115,7 +115,7 @@ function bounce_convert_views_data() {
       'handler' => 'views_handler_sort',
     ),
   );
-  $data['bounce_convert_impressions']['path'] = array(
+  $data['bounce_convert_impression']['path'] = array(
     'title' => t('Internal path'),
     'help' => t('Internal path to page visited (relative to Drupal root.)'),
     'field' => array(
@@ -130,7 +130,7 @@ function bounce_convert_views_data() {
     ),
   );
 
-  $data['bounce_convert_impressions']['timestamp'] = array(
+  $data['bounce_convert_impression']['timestamp'] = array(
     'title' => t('Timestamp'), //Custom external table field
     'help' => t('Timestamp of when the page was visited.'),
     'field' => array(
@@ -145,7 +145,7 @@ function bounce_convert_views_data() {
     ),
   );
 
-  $data['bounce_convert_impressions']['id'] = array(
+  $data['bounce_convert_impression']['id'] = array(
     'title' => t('Unique identifier for impression'), //Custom external table field
     'help' => t('Primary key for table'),
     'field' => array('handler' => 'views_handler_field'),

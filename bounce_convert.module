@@ -83,7 +83,7 @@ function bounce_convert_impression_callback() {
 
   if ($bounce_convert_campaign_id != '') {
     //Insert impression value to table
-    $id = db_insert('bounce_convert_impressions')
+    $id = db_insert('bounce_convert_impression')
         ->fields(array(
           'webform_id' => $bounce_convert_webform_id,
           'campaign_id' => $bounce_convert_campaign_id,
@@ -153,7 +153,7 @@ function bounce_convert_get_submissions() {
     $output .= theme('bounce_convert', array(
       'bounce_convert_filter_url' => $bounce_convert_filter_url,
       'bounce_convert_percentage' => $bounce_convert_percentage,
-      'bounce_convert_impressions' => $bounce_convert_total_impression,
+      'bounce_convert_impression' => $bounce_convert_total_impression,
       'bounce_convert_conversions' => $bounce_convert_total_conversion,
         )
     );
@@ -181,7 +181,7 @@ function bounce_convert_theme() {
       'variables' => array(
         'bounce_convert_filter_url' => NULL,
         'bounce_convert_percentage' => NULL,
-        'bounce_convert_impressions' => NULL,
+        'bounce_convert_impression' => NULL,
         'bounce_convert_conversions' => NULL),
     ),
     'bounce_convert_campaign_filter' => array(
@@ -546,12 +546,12 @@ function bounce_convert_campaign_list() {
     $nid = $data->nid;
     $vid = $data->vid;
 //    SELECT SUM( impression )
-//    FROM bounce_convert_impressions
+//    FROM bounce_convert_impression
 //    WHERE campaign_id = 35296
 
-    $total_impressions = db_query("SELECT SUM(impression) FROM {bounce_convert_impressions} WHERE campaign_id = :nid", array(':nid' => $nid))->fetchField();
-    $total_conversions = db_query("SELECT SUM(conversion) FROM {bounce_convert_impressions} WHERE campaign_id = :nid", array(':nid' => $nid))->fetchField();
-    $webform_id = db_query("SELECT webform_id FROM {bounce_convert_impressions} WHERE campaign_id = :nid", array(':nid' => $nid))->fetchField();
+    $total_impressions = db_query("SELECT SUM(impression) FROM {bounce_convert_impression} WHERE campaign_id = :nid", array(':nid' => $nid))->fetchField();
+    $total_conversions = db_query("SELECT SUM(conversion) FROM {bounce_convert_impression} WHERE campaign_id = :nid", array(':nid' => $nid))->fetchField();
+    $webform_id = db_query("SELECT webform_id FROM {bounce_convert_impression} WHERE campaign_id = :nid", array(':nid' => $nid))->fetchField();
     $campagin_status = db_query("SELECT field_bcc_active_value FROM {field_data_field_bcc_active} WHERE entity_id = :nid AND revision_id = :vid", array(':nid' => $nid, ':vid' => $vid))->fetchField();
     if (!$total_impressions) {
       $total_impressions = 0;
@@ -602,7 +602,7 @@ function bounce_convert_campaign_list() {
  *   associated with a bounce convert campaign.
  */
 function _bounce_convert_get_campaign_id_from_webform_id($webform_id) {
-  $campaign_id = db_query("SELECT campaign_id FROM {bounce_convert_impressions} WHERE webform_id = :webform_id LIMIT 1", array(':webform_id' => $webform_id), array('target' => 'slave'))->fetchField();
+  $campaign_id = db_query("SELECT campaign_id FROM {bounce_convert_impression} WHERE webform_id = :webform_id LIMIT 1", array(':webform_id' => $webform_id), array('target' => 'slave'))->fetchField();
   if ($campaign_id) {
     return $campaign_id;
   }
