@@ -16,7 +16,7 @@
                 if (success_val < last_mouse_y && success_val <= current_scroll && e.clientY < 120) {
                     var visited = jQuery.cookie('bounce_convert_cookie');
                     // If cookie time is not expired or Modal/Popup is alreay open
-                    if (visited === '1' || jQuery(".popups-container").length > 0) {
+                    if (visited === '1' || jQuery(".popups-container").length > 0 || !Drupal.settings.bounce_convert) {
                         return false;
                     } else {
                         //@cookie_expiry set value while create bounce convert campaign
