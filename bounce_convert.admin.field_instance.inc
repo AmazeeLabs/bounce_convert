@@ -142,7 +142,7 @@ function bounce_convert_field_default_field_instances() {
     'bundle' => 'bounce_convert',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => $t('Time in seconds. The popup will not be shown again to the same person until this amount of time has passed. Enter 0 to always show the popup.'),
+    'description' => $t('Time in seconds. The popup will not be shown again to the same person until this amount of time has passed. Enter 0 to always show the popup (not recommended, except for testing).'),
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -280,7 +280,7 @@ function bounce_convert_field_default_field_instances() {
     ),
     'entity_type' => 'node',
     'field_name' => 'field_bcc_pages_list',
-    'label' => $t(''),
+    'label' => $t('Pages list'),
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -380,7 +380,7 @@ function bounce_convert_field_default_field_instances() {
     'bundle' => 'bounce_convert',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => $t('Show this block only for the selected role(s). If you select no roles, the block will be visible to all users.'),
+    'description' => $t('Show this campaign only for the selected role(s). If you select no roles, the campaign will be shown to all users.'),
     'display' => array(
       'default' => array(
         'label' => 'above',

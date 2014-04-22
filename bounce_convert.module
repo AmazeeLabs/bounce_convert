@@ -246,7 +246,7 @@ function bounce_convert_field_group_info() {
     'format_settings' => array(
       'formatter' => 'collapsible',
       'instance_settings' => array(
-        'description' => '',
+        'description' => 'These fields control the settings for the modal popup which will display your chosen Webform when a visitor is about to leave.',
         'classes' => 'group-bcc-modal-options field-group-fieldset',
         'required_fields' => 1,
       ),
@@ -586,9 +586,9 @@ function bounce_convert_campaign_list() {
 
 /**
  * Utility function to fetch bounce campaign id from a given webform id.
- * @param $webform_id
+ * @param int $webform_id
  *   Webform nid.
- * @return
+ * @return int|bool
  *   The bounce convert campaign nid, or FALSE if the given webform is not
  *   associated with a bounce convert campaign.
  */

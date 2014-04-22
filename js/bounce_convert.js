@@ -1,6 +1,6 @@
 /**
  * @file
- * Handle Bounce Conver modal and cookie for users
+ * Handle Bounce Convert modal and cookie for users.
  */
 (function() {
 
