@@ -77,6 +77,14 @@ example, by moving your mouse as if to click your browser's "back" button). The
 modal popup should then be displayed. 
 
 ================================================================================
+ THEMING
+================================================================================
+
+Your webform and modal popup can be themed in the same way that you would
+theme any other Drupal elements. Generally, inspecting the code and adding
+some targetted css is all that is needed.
+
+================================================================================
  TROUBLESHOOTING
 ================================================================================
 
