@@ -25,6 +25,12 @@ and allows you to collect and track impression and conversion data for every
 campaign that you run.
 
 ================================================================================
+ Screencast
+================================================================================
+
+A brief introductory screencast is available at <http://youtu.be/ilIfhD7J9ek>.
+
+================================================================================
  DEPENDENCIES
 ================================================================================
 
