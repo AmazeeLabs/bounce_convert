@@ -1,6 +1,5 @@
 name = Bounce Convert
-description = Detect and convert exiting web visitors into revenue
-package = Other
+description = Convert exiting web visitors into leads.
 core = 7.x
 dependencies[] = views
 dependencies[] = webform
