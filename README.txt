@@ -85,7 +85,7 @@ If your modal popup is not being displayed as expected:
 1. Make sure that you have created a Bounce Convert Campaign node.
 2. Make sure that you are moving your mouse cursor above the browser plane (for
    example, by moving your mouse as if to click your browser's "back" button).
-2. Make sure that your campaign is set to ACTIVE and PUBLISHED (two seperate
+2. Make sure that your campaign is set to ACTIVE and PUBLISHED (two separate
    settings).
 3. Check your campaigns page visitility and role visibility settings. For
    testing, we suggest you remove all page rules and role visibility roles.
