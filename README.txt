@@ -102,14 +102,14 @@ If your modal popup is not being displayed as expected:
    0 (zero).
    
 ================================================================================
- WARNING
+ WARNING ABOUT MULTIPLE ACTIVE CAMPAIGNS
 ================================================================================   
    
 It is possible to have multiple Bounce Convert campaigns running at once, but
 if you have multiple active campaigns running at the same time, make sure that
 the visibility settings for the active campaigns do not overlap. The module
-is not designed to show more than one campaign to the same use on the same page,
-and will break if you try to do so.   
+is not designed to show more than one campaign to the same user on the same 
+page, and will break if you try to do so.   
    
 ================================================================================
  CAMPAIGN REPORTS
