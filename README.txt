@@ -81,8 +81,9 @@ modal popup should then be displayed.
 ================================================================================
 
 Your webform and modal popup can be themed in the same way that you would
-theme any other Drupal elements. Generally, inspecting the code and adding
-some targetted css is all that is needed.
+theme any other Drupal elements. Generally, getting the modal to popup, then 
+inspecting the markup with a tool like Firebug and adding some targetted css to 
+your theme's style.css file is all that is needed.
 
 ================================================================================
  TROUBLESHOOTING
@@ -93,11 +94,11 @@ If your modal popup is not being displayed as expected:
 1. Make sure that you have created a Bounce Convert Campaign node.
 2. Make sure that you are moving your mouse cursor above the browser plane (for
    example, by moving your mouse as if to click your browser's "back" button).
-2. Make sure that your campaign is set to ACTIVE and PUBLISHED (two separate
+3. Make sure that your campaign is set to ACTIVE and PUBLISHED (two separate
    settings).
-3. Check your campaigns page visitility and role visibility settings. For
+4. Check your campaign's page visitility and role visibility settings. For
    testing, we suggest you remove all page rules and role visibility roles.
-4. Make sure that the cookie expiration time has passed, or the popup will
+5. Make sure that the cookie expiration time has passed, or the popup will
    not be shown again for your browser. For testing, set cookie expiration to
    0 (zero).
    
