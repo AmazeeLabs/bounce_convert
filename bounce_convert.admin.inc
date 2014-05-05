@@ -4,11 +4,13 @@
  * @file
  * All functions within this file are related to admin
  */
+// All functions within this file need the bellow files.
 define('BOUNCE_CONVERT_CONTENT_TYPE', 'bounce_convert_campaign');
 
 /**
- * Return all publish webforms
+ * Return all publish webforms.
  * @return array
+ *   Node type "webform".
  */
 function bounce_convert_webforms() {
   $nodes = node_load_multiple(array(), array(
@@ -26,69 +28,59 @@ function bounce_convert_webforms() {
 }
 
 /**
- * Return campagins per uesr role type
- * @param array $user_rids
- * @return array
+ * Return campagins per uesr role type.
+ * 
+ * @param role ids of login user.
+ * @return bool
+ *   Whether to show or not the campaign.
  */
 function bounce_convert_check_campaigns($user_rids) {
-  //Default value to not show the modal
+  // Default value to not show the modal.
   $bounce_convert_show_moadal = FALSE;
-  $data = '';
-  //get role ids instead of role names
+
+  // Get role ids instead of role names.
   $user_rids = array_keys($user_rids);
 
-  //fetch only published and active campagins (ie: status = 1 and active = yes).
-  $query = new EntityFieldQuery;
+  // Fetch only published and active campagins (ie: status = 1 and active = yes).
+  $query = new EntityFieldQuery();
   $result = $query
       ->entityCondition('entity_type', 'node')
       ->propertyCondition('status', 1)
       ->fieldCondition('field_bcc_active', 'value', 'Yes', '=')
       ->execute();
 
-  //Check if campaign exists.
+  // Check if campaign exists.
   if (!empty($result)) {
     foreach ($result['node'] as $obj_node) {
       $node = node_load($obj_node->nid, $obj_node->vid);
-
-
-
-      /*
-       * Filter campaigns by user role
-       * If user role matches with campaign role THEN show modal ELSE don't show
-       */
+      // Filter campaigns by user role
+      // If user role matches with campaign role, show modal ELSE don't
       if (!bounce_convert_check_user_role($node, $user_rids)) {
         continue;
       }
 
       /*
        * Check for: User selected option from bellow options:
-       * 0 - show modal on all pages except bellow
-       * 1 - show modal only on bellow listed pages
-       * 2 - show modal only if PHP returns TRUE
-       * NULL - mean show on all pages (site wide)
+       * 0 - show modal on all pages except bellow.
+       * 1 - show modal only on bellow listed pages.
+       * 2 - show modal only if PHP returns TRUE.
+       * NULL - mean show on all pages (site wide).
        */
       $bounce_convert_pages_option = field_get_items('node', $node, 'field_bcc_pages_option');
-
-
-      // Check if not NULL, at least one option is selected
+      // Check if not NULL, at least one option is selected.
       if (!empty($bounce_convert_pages_option)) {
-        // Get user selected option
+        // Get user selected option.
         $bounce_convert_pages_option = $bounce_convert_pages_option[0]['value'];
-
-        // Fetch path list
+        // Fetch path list.
         $paths = bounce_convert_path_list($node, $bounce_convert_pages_option);
-
         $bounce_convert_show_moadal = bounce_convert_check_page_path($paths, $bounce_convert_pages_option);
         if ($bounce_convert_show_moadal) {
           $properties = bounce_convert_get_webform_properties($node);
           return $properties;
         }
-        else {
-          return FALSE;
-        }
       }
       else {
-        //show modal on all pages if no option is selected
+        // Show modal on all pages if no option is selected.
         return bounce_convert_get_webform_properties($node);
       }
     }
@@ -97,9 +89,12 @@ function bounce_convert_check_campaigns($user_rids) {
 }
 
 /**
- * Return paths
- * @param object $node
- * @return array
+ * Return paths.
+ * 
+ * @param object $node Contains information about campaign.
+ * 
+ * @return array 
+ *   list of path/pages for particular campaign.
  */
 function bounce_convert_path_list($node, $bounce_convert_pages_option) {
 
@@ -119,7 +114,7 @@ function bounce_convert_path_list($node, $bounce_convert_pages_option) {
       $bounc_convert_paths = explode(',', $bounce_convert_field_visibility_settings);
     }
     else {
-      // Return PHP code as it is
+      // Return PHP code as it is.
       $bounce_convert_field_visibility_settings = field_get_items('node', $node, 'field_bcc_pages_list');
       $bounc_convert_paths = $bounce_convert_field_visibility_settings[0]['safe_value'];
     }
@@ -128,9 +123,12 @@ function bounce_convert_path_list($node, $bounce_convert_pages_option) {
 }
 
 /**
- * Fetch node object properties
- * @param object $node
+ * Fetch node object properties.
+ * 
+ * @param object $node contains information about campaign.
+ * 
  * @return array
+ *   Webform properties.
  */
 function bounce_convert_get_webform_properties($node) {
   $campaign_node_id = $node->nid;
@@ -153,11 +151,9 @@ function bounce_convert_get_webform_properties($node) {
   $field_bcc_modal_height = field_get_items('node', $node, 'field_bcc_modal_height');
   $field_bcc_modal_height = isset($field_bcc_modal_height[0]['value']) ? (int) $field_bcc_modal_height[0]['value'] : 500;
 
-
   $data['campaign_node_id'] = $campaign_node_id;
   $data['webform_id'] = $bounce_convert_webfrom_nid;
   $data['campaign_visit_cookie'] = $bounce_convert_cookie_expiration;
-
   $data['modal_bgcolor'] = $field_bcc_background_color;
   $data['modal_opacity'] = $field_bcc_background_opacity;
   $data['modal_width'] = $field_bcc_modal_width;
@@ -167,40 +163,50 @@ function bounce_convert_get_webform_properties($node) {
 }
 
 /**
- * @param object $node
- * @param array $user_rids
- * @return boolean
+ * Check if campaign is for particular role users.
+ *  
+ * @param object $node Node containing campaign properties.
+ * 
+ * @param array $user_rids User role ids to match with campaign assigned roles.
+ * 
+ * @return bool
+ *   Return TRUE if no role is set or user role matches.
  */
 function bounce_convert_check_user_role($node, $user_rids) {
   // Check if role is set for campaing
   if (!empty($node->field_bcc_specific_user_roles)) {
 
-    // Get all roles which is set for that particular campaign
-    foreach ($node->field_bcc_specific_user_roles['und'] as $role) {
+    // Get all roles which is set for that particular campaign.
+    foreach ($node->field_bcc_specific_user_roles[LANGUAGE_NONE] as $role) {
       $campaign_roles[] = $role['value'];
     }
 
     // Check if user role matches campaign role.
     $result = array_intersect($campaign_roles, $user_rids);
-    // If match return TRUE
+    // If match return TRUE.
     if (!empty($result)) {
       return TRUE;
     }
     else {
-      // if user role DOESN'T matches campaign role return FALSE
+      // if user role DOESN'T matches campaign role return FALSE.
       return FALSE;
     }
   }
   else {
-    //If no role is set for campaign then show to all roles/users.
+    // If no role is set for campaign then show to all roles/users.
     return TRUE;
   }
 }
 
 /**
- * Wheater show modal on current page/path or not
- * @param type $bounce_convert_field_visibility_settings
- * @return boolean
+ * Wheater show modal on current page/path or not.
+ * 
+ * @param array $bounce_convert_pages_option Only listed pages/Except Listed.
+ * 
+ * @param array $paths list of paths/pages to show campaign on.
+ * 
+ * @return bool
+ *   Whether path matched or not for a campaign.
  */
 function bounce_convert_check_page_path($paths, $bounce_convert_pages_option) {
   /*
@@ -217,33 +223,37 @@ function bounce_convert_check_page_path($paths, $bounce_convert_pages_option) {
   if (empty($paths) && $bounce_convert_pages_option == 2) {
     return TRUE;
   }
-  //PHP code option is selected and code is given
+  // PHP code option is selected and code is given.
   if (!empty($paths) && $bounce_convert_pages_option == 2) {
-    return check_php_code($paths);
+    return bounce_convert_check_php_code($paths);
   }
 
-  //exact match eg. admin/modules
+  // Exact match eg. admin/modules.
   if (in_array(current_path(), $paths)) {
 
     switch ($bounce_convert_pages_option) {
       case 0:
         return FALSE;
+        break;
       case 1:
         return TRUE;
+        break;
     }
   }
   else {
 
-    // wild card character path eg. admin/*
+    // Wild card character path eg. admin/*
     foreach ($paths as $key => $path) {
       $path = $paths[$key] = str_replace('*', '', $path);
-
+      // TODO: drupal_is_front_page() not working with overlay module.
       if (($path == '&lt;front&gt;' || $path == '<front>') && drupal_is_front_page()) {
         switch ($bounce_convert_pages_option) {
           case 0:
             return FALSE;
+            break;
           case 1:
             return TRUE;
+            break;
         }
       }
 
@@ -256,16 +266,20 @@ function bounce_convert_check_page_path($paths, $bounce_convert_pages_option) {
         switch ($bounce_convert_pages_option) {
           case 0:
             return FALSE;
+            break;
           case 1:
             return TRUE;
+            break;
         }
       }
       else {
         switch ($bounce_convert_pages_option) {
           case 0:
             return TRUE;
+            break;
           case 1:
             return FALSE;
+            break;
         }
       }
     }
@@ -273,11 +287,14 @@ function bounce_convert_check_page_path($paths, $bounce_convert_pages_option) {
 }
 
 /**
- * Evaluate user given PHP code
- * @param string $code
- * @return boolean
+ * Evaluate user given PHP code.
+ * 
+ * @param string $code PHP code which need to be evolated.
+ * 
+ * @return bool
+ *   Whether PHP return TURE or FALSE. 
  */
-function check_php_code($code) {
+function bounce_convert_check_php_code($code) {
   $code = html_entity_decode($code);
   $result = php_eval($code);
 
@@ -290,7 +307,7 @@ function check_php_code($code) {
 }
 
 /**
- * Add custom fields for content type campaign
+ * Add custom fields for content type campaign.
  */
 function bounce_convert_add_fields() {
   foreach (bounce_convert_field_default_field_bases() as $field) {
@@ -304,22 +321,24 @@ function bounce_convert_add_fields() {
 }
 
 /**
- * Delete custom fields for content type campaign
+ * Delete custom fields for content type campaign.
  */
 function bounce_convert_delete_fields() {
   foreach (array_keys(bounce_convert_field_default_field_bases()) as $field) {
     field_delete_field($field);
   }
   $instances = field_info_instances('node', BOUNCE_CONVERT_CONTENT_TYPE);
-  foreach ($instances as $instance_name => $fieldinstance) {
+  foreach ($instances as $fieldinstance) {
     field_delete_instance($fieldinstance);
   }
 }
 
 /**
- * When user submits campaign an entry is made in DB
- * @param type $form
- * @param type $form_state
+ * When user submits campaign an entry is made in DB.
+ * 
+ * @param array $form contains form elements.
+ * 
+ * @param array $form_state contains form fields value.
  */
 function bounce_convert_user_conversion(&$form, &$form_state) {
   $bounce_convert_nid = $form_state['values']['details']['nid'];
@@ -327,7 +346,7 @@ function bounce_convert_user_conversion(&$form, &$form_state) {
   $ip_address = ip_address();
   $bounce_convert_id = db_query("SELECT MAX(id) FROM {bounce_convert_impression} WHERE webform_id = :webform_id AND ip_address = :ip_address", array(':webform_id' => $bounce_convert_nid, ':ip_address' => $ip_address))->fetchField();
 
-  // Update existing record with impression ++
+  // Update existing record with impression.
   db_update('bounce_convert_impression')
       ->fields(array(
         'sid' => $bounce_convert_sid,
@@ -338,15 +357,19 @@ function bounce_convert_user_conversion(&$form, &$form_state) {
 }
 
 /**
- * Return impression/conversion data array from DB
- * @param string $report_duration
- * @param string $db_column
+ * Return impression/conversion data array from DB.
+ * 
+ * @param string $report_duration time duration.
+ * 
+ * @param string $db_column Table column name.
+ * 
  * @return array
+ *   Resut containing impressions and conversions.
  */
 function bounce_convert_chart_data($report_duration, $db_column, $nid) {
   $data = '';
 
-  //if any time duration is selected from filter options
+  // If any time duration is selected from filter options.
   switch ($report_duration) {
     case 'today':
       $y = 6;
@@ -356,10 +379,8 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         $y = $i + 1;
         $end_of_the_day = date('Y-m-d h A', mktime($y, 0, 0, date("m"), date("d"), date("Y")));
         $end_of_the_day_str = strtotime($end_of_the_day);
-
         $query = db_select('bounce_convert_impression', 'bci');
-        $query->
-            condition('campaign_id', $nid, '=')
+        $query->condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -371,7 +392,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         }
       }
       return $data;
-      break;
+
     case 'yesterday':
       $y = 6;
       for ($i = 0; $i <= 23; $i++) {
@@ -382,8 +403,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         $end_of_the_day_str = strtotime($end_of_the_day);
 
         $query = db_select('bounce_convert_impression', 'bci');
-        $query->
-            condition('campaign_id', $nid, '=')
+        $query->condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -395,7 +415,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         }
       }
       return $data;
-      break;
+
     case '7days':
       for ($i = 7; $i > 0; $i--) {
         $start_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), date("d") - $i, date("Y")));
@@ -405,8 +425,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         $end_of_the_day_str = strtotime($end_of_the_day);
 
         $query = db_select('bounce_convert_impression', 'bci');
-        $query->
-            condition('campaign_id', $nid, '=')
+        $query->condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -418,7 +437,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         }
       }
       return $data;
-      break;
+
     case '30days':
       for ($i = 30; $i > 0; $i--) {
         $start_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), date("d") - $i, date("Y")));
@@ -428,8 +447,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         $end_of_the_day_str = strtotime($end_of_the_day);
 
         $query = db_select('bounce_convert_impression', 'bci');
-        $query->
-            condition('campaign_id', $nid, '=')
+        $query->condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -441,10 +459,9 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         }
       }
       return $data;
-      break;
+
     case 'this-month':
       for ($i = 0; $i < date("d"); $i++) {
-
         $start_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), $i + 1, date("Y")));
         $start_of_the_day_str = strtotime($start_of_the_day);
         $y = $i + 1;
@@ -452,8 +469,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         $end_of_the_day_str = strtotime($end_of_the_day);
 
         $query = db_select('bounce_convert_impression', 'bci');
-        $query->
-            condition('campaign_id', $nid, '=')
+        $query->condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -465,9 +481,9 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         }
       }
       return $data;
-      break;
+
     case 'last-month':
-      $last_month_days = count_last_month_days();
+      $last_month_days = bounce_convert_count_last_month_days();
       for ($i = 0; $i < $last_month_days; $i++) {
 
         $start_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m") - 1, $i + 1, date("Y")));
@@ -477,8 +493,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         $end_of_the_day_str = strtotime($end_of_the_day);
 
         $query = db_select('bounce_convert_impression', 'bci');
-        $query->
-            condition('campaign_id', $nid, '=')
+        $query->condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -490,10 +505,9 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         }
       }
       return $data;
-      break;
+
     default :
       for ($i = 7; $i > 0; $i--) {
-
         $start_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), date("d") - $i, date("Y")));
         $start_of_the_day_str = strtotime($start_of_the_day);
         $y = $i - 1;
@@ -501,8 +515,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         $end_of_the_day_str = strtotime($end_of_the_day);
 
         $query = db_select('bounce_convert_impression', 'bci');
-        $query->
-            condition('campaign_id', $nid, '=')
+        $query->condition('campaign_id', $nid, '=')
             ->condition($db_column, 1, '=')
             ->condition('timestamp', $start_of_the_day_str, '>=')
             ->condition('timestamp', $end_of_the_day_str, '<=')
@@ -514,29 +527,29 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
         }
       }
       return $data;
-      break;
   }
 }
 
 /**
  * @param type $report_duration
- * @return array contains labels per filter type(ie:for days,Months,hours etc.)
+ * @return array
+ *   Contains labels per filter type(ie:for days,Months,hours etc.)
  */
 function bounce_convert_chart_labels($report_duration) {
-  //if any time duration is selected from filter options
+  // If any time duration is selected from filter options.
   $labels = array();
   switch ($report_duration) {
     case '7days':
       for ($i = 6; $i >= 0; $i--) {
-        $labels[] = t(date('m/d', mktime($i, 0, 0, date("m"), date("d") - $i, date("Y"))));
+        $labels[] = date('m/d', mktime($i, 0, 0, date("m"), date("d") - $i, date("Y")));
       }
       return $labels;
-      break;
+
     case 'today':
       $y = 1;
       for ($i = 0; $i <= 23; $i++) {
         if ($y == 3 || $i == 0) {
-          $labels[] = t(date('m/d @ hA', mktime($i, 0, 0, date("m"), date("d"), date("Y"))));
+          $labels[] = date('m/d @ hA', mktime($i, 0, 0, date("m"), date("d"), date("Y")));
           $y = 1;
         }
         else {
@@ -545,12 +558,12 @@ function bounce_convert_chart_labels($report_duration) {
         }
       }
       return $labels;
-      break;
+
     case 'yesterday':
       $y = 1;
       for ($i = 0; $i <= 23; $i++) {
         if ($y == 3 || $i == 0) {
-          $labels[] = t(date('m/d @ hA', mktime($i, 0, 0, date("m"), date("d") - 1, date("Y"))));
+          $labels[] = date('m/d @ hA', mktime($i, 0, 0, date("m"), date("d") - 1, date("Y")));
           $y = 1;
         }
         else {
@@ -559,12 +572,12 @@ function bounce_convert_chart_labels($report_duration) {
         }
       }
       return $labels;
-      break;
+
     case '30days':
       $y = 1;
       for ($i = 29; $i >= 0; $i--) {
         if ($y == 2 || $i == 0) {
-          $labels[] = t(date('m/d', mktime($i, 0, 0, date("m"), date("d") - $i, date("Y"))));
+          $labels[] = date('m/d', mktime($i, 0, 0, date("m"), date("d") - $i, date("Y")));
           $y = 1;
         }
         else {
@@ -573,19 +586,19 @@ function bounce_convert_chart_labels($report_duration) {
         }
       }
       return $labels;
-      break;
+
     case 'this-month':
       for ($i = 0; $i < date("d"); $i++) {
-        $labels[] = t(date('m/d', mktime(0, 0, 0, date("m"), $i + 1, date("Y"))));
+        $labels[] = date('m/d', mktime(0, 0, 0, date("m"), $i + 1, date("Y")));
       }
       return $labels;
-      break;
+
     case 'last-month':
       $y = 1;
-      $last_month_days = count_last_month_days();
+      $last_month_days = bounce_convert_count_last_month_days();
       for ($i = 0; $i < $last_month_days; $i++) {
         if ($y == 2 || $i == 0) {
-          $labels[] = t(date('m/d', mktime(0, 0, 0, date("m") - 1, 1 + $i, date("Y"))));
+          $labels[] = date('m/d', mktime(0, 0, 0, date("m") - 1, 1 + $i, date("Y")));
           $y = 1;
         }
         else {
@@ -594,21 +607,21 @@ function bounce_convert_chart_labels($report_duration) {
         }
       }
       return $labels;
-      break;
-    default :
+
+    default:
       for ($i = 6; $i >= 0; $i--) {
-        $labels[] = t(date('m/d', strtotime("-$i days")));
+        $labels[] = date('m/d', strtotime("-$i days"));
       }
       return $labels;
-      break;
   }
 }
 
 /**
+ * Total days of last month.
  * @return int
- * Total days of last month
+ *   Number of days from last month.
  */
-function count_last_month_days() {
+function bounce_convert_count_last_month_days() {
   if (date("m") == 1 || date("m") == 01 || date("m") == '01') {
     $last_month_days = cal_days_in_month(CAL_GREGORIAN, date("m"), date("Y"));
   }
@@ -620,8 +633,7 @@ function count_last_month_days() {
 
 /**
  * @return float
- * Convertion Percentage
- * (Conversion/Submission)*100
+ *   Conversion Percentage * (Conversion/Submission) * 100.
  */
 function bounce_convert_overall_percentage($bounce_convert_total_conversion, $bounce_convert_total_impression) {
   if ($bounce_convert_total_conversion > 0) {
