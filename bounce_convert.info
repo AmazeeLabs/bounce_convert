@@ -7,4 +7,3 @@ dependencies[] = ctools
 dependencies[] = charts
 
 stylesheets[all][] = css/bounce_convert.css
-

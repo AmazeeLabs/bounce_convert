@@ -30,7 +30,8 @@ function bounce_convert_webforms() {
 /**
  * Return campagins per uesr role type.
  * 
- * @param role ids of login user.
+ * @param user_rids role ids of login user.
+ * 
  * @return bool
  *   Whether to show or not the campaign.
  */
@@ -41,7 +42,7 @@ function bounce_convert_check_campaigns($user_rids) {
   // Get role ids instead of role names.
   $user_rids = array_keys($user_rids);
 
-  // Fetch only published and active campagins (ie: status = 1 and active = yes).
+  // Fetch only published and active campagins(ie:status = 1 and active = yes).
   $query = new EntityFieldQuery();
   $result = $query
       ->entityCondition('entity_type', 'node')
@@ -89,9 +90,10 @@ function bounce_convert_check_campaigns($user_rids) {
 }
 
 /**
- * Return paths.
+ * Return a list of paths.
  * 
- * @param object $node Contains information about campaign.
+ * @param object $node 
+ *   Contains information about campaign.
  * 
  * @return array 
  *   list of path/pages for particular campaign.
@@ -125,7 +127,8 @@ function bounce_convert_path_list($node, $bounce_convert_pages_option) {
 /**
  * Fetch node object properties.
  * 
- * @param object $node contains information about campaign.
+ * @param object $node 
+ *   Contains information about campaign.
  * 
  * @return array
  *   Webform properties.
@@ -165,9 +168,11 @@ function bounce_convert_get_webform_properties($node) {
 /**
  * Check if campaign is for particular role users.
  *  
- * @param object $node Node containing campaign properties.
+ * @param object $node
+ *   Node containing campaign properties.
  * 
- * @param array $user_rids User role ids to match with campaign assigned roles.
+ * @param array $user_rids 
+ *   User role ids to match with campaign assigned roles.
  * 
  * @return bool
  *   Return TRUE if no role is set or user role matches.
@@ -188,7 +193,7 @@ function bounce_convert_check_user_role($node, $user_rids) {
       return TRUE;
     }
     else {
-      // if user role DOESN'T matches campaign role return FALSE.
+      // If user role DOESN'T matches campaign role return FALSE.
       return FALSE;
     }
   }
@@ -201,9 +206,11 @@ function bounce_convert_check_user_role($node, $user_rids) {
 /**
  * Wheater show modal on current page/path or not.
  * 
- * @param array $bounce_convert_pages_option Only listed pages/Except Listed.
+ * @param array $paths 
+ *   List of paths/pages to show campaign on.
  * 
- * @param array $paths list of paths/pages to show campaign on.
+ * @param array $bounce_convert_pages_option 
+ *   Only listed pages/Except Listed.
  * 
  * @return bool
  *   Whether path matched or not for a campaign.
@@ -228,17 +235,19 @@ function bounce_convert_check_page_path($paths, $bounce_convert_pages_option) {
     return bounce_convert_check_php_code($paths);
   }
 
+  $bounce_convert_return = FALSE;
   // Exact match eg. admin/modules.
   if (in_array(current_path(), $paths)) {
 
     switch ($bounce_convert_pages_option) {
       case 0:
-        return FALSE;
+        $bounce_convert_return = FALSE;
         break;
       case 1:
-        return TRUE;
+        $bounce_convert_return = TRUE;
         break;
     }
+    return $bounce_convert_return;
   }
   else {
 
@@ -249,12 +258,13 @@ function bounce_convert_check_page_path($paths, $bounce_convert_pages_option) {
       if (($path == '&lt;front&gt;' || $path == '<front>') && drupal_is_front_page()) {
         switch ($bounce_convert_pages_option) {
           case 0:
-            return FALSE;
+            $bounce_convert_return = FALSE;
             break;
           case 1:
-            return TRUE;
+            $bounce_convert_return = TRUE;
             break;
         }
+        return $bounce_convert_return;
       }
 
       if (substr($path, -1) == '/') {
@@ -265,31 +275,34 @@ function bounce_convert_check_page_path($paths, $bounce_convert_pages_option) {
 
         switch ($bounce_convert_pages_option) {
           case 0:
-            return FALSE;
+            $bounce_convert_return = FALSE;
             break;
           case 1:
-            return TRUE;
+            $bounce_convert_return = TRUE;
             break;
         }
+        return $bounce_convert_return;
       }
       else {
         switch ($bounce_convert_pages_option) {
           case 0:
-            return TRUE;
+            $bounce_convert_return = TRUE;
             break;
           case 1:
-            return FALSE;
+            $bounce_convert_return = FALSE;
             break;
         }
+        return $bounce_convert_return;
       }
     }
   }
 }
 
 /**
- * Evaluate user given PHP code.
+ *  Evaluate user given PHP code.
  * 
- * @param string $code PHP code which need to be evolated.
+ * @param string $code 
+ *   PHP code which need to be evolated.
  * 
  * @return bool
  *   Whether PHP return TURE or FALSE. 
@@ -336,9 +349,11 @@ function bounce_convert_delete_fields() {
 /**
  * When user submits campaign an entry is made in DB.
  * 
- * @param array $form contains form elements.
+ * @param array $form 
+ *   Contains form elements.
  * 
- * @param array $form_state contains form fields value.
+ * @param array $form_state 
+ *   Contains form fields value.
  */
 function bounce_convert_user_conversion(&$form, &$form_state) {
   $bounce_convert_nid = $form_state['values']['details']['nid'];
@@ -359,9 +374,11 @@ function bounce_convert_user_conversion(&$form, &$form_state) {
 /**
  * Return impression/conversion data array from DB.
  * 
- * @param string $report_duration time duration.
+ * @param string $report_duration
+ *   Time duration.
  * 
- * @param string $db_column Table column name.
+ * @param string $db_column
+ *   Table column name.
  * 
  * @return array
  *   Resut containing impressions and conversions.
@@ -506,7 +523,7 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
       }
       return $data;
 
-    default :
+    default:
       for ($i = 7; $i > 0; $i--) {
         $start_of_the_day = date('Y-m-d', mktime(0, 0, 0, date("m"), date("d") - $i, date("Y")));
         $start_of_the_day_str = strtotime($start_of_the_day);
@@ -531,7 +548,11 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
 }
 
 /**
- * @param type $report_duration
+ * Create campaign report for chart.
+ * 
+ * @param array $report_duration
+ *   Time duration.
+ * 
  * @return array
  *   Contains labels per filter type(ie:for days,Months,hours etc.)
  */

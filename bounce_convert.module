@@ -58,7 +58,7 @@ function bounce_convert_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  // ctools modal form
+  // Ctools modal form.
   $items['ctools_ajax_sample/%ctools_js/bounce-convert/%'] = array(
     'title' => 'Campaign',
     'page callback' => 'bounce_convert_ctools_modal',
@@ -80,9 +80,11 @@ function bounce_convert_ctools_modal($js, $webform_nid) {
 /**
  * Handle CTools modal webforms.
  * 
- * @param type $js whether to $js available or not.
+ * @param type $js
+ *   Whether to $js available or not.
  * 
- * @param type $webform_nid nid of the webform
+ * @param type $webform_nid
+ *   Nid of the webform.
  * 
  * @return array
  *   Modal popup
@@ -105,7 +107,7 @@ function bounce_convert_ajax_modal_webform($js = NULL, $webform_nid = NULL) {
   $output = ctools_modal_form_wrapper('webform_client_form_' . $webform_nid, $form_state);
   $webform_submited = isset($form_state['webform_completed']) ? $form_state['webform_completed'] : FALSE;
   if ($webform_submited == TRUE) {
-    $confirm_message = db_query("SELECT confirmation FROM {webform} WHERE nid = :webform_nid", array(':webform_nid' => $webform_nid,))->fetchField();
+    $confirm_message = db_query("SELECT confirmation FROM {webform} WHERE nid = :webform_nid", array(':webform_nid' => $webform_nid))->fetchField();
     if ($confirm_message == "") {
       $confirm_message = "Thank you, your submission has been received.";
     }
@@ -114,7 +116,6 @@ function bounce_convert_ajax_modal_webform($js = NULL, $webform_nid = NULL) {
         drupal_render($confirm_message) .
         '</div>';
     $output = array(); // Recreate output.
-    // Oerwrite the form output if it was successful.
     $output[] = ctools_modal_command_display('Confirmation', $confirmation);
   }
 
@@ -235,6 +236,7 @@ function bounce_convert_get_submissions() {
 
 /**
  * Theme filter option for chart.
+ * 
  * Implements hook_theme().
  */
 function bounce_convert_theme() {
@@ -258,6 +260,7 @@ function bounce_convert_theme() {
 
 /**
  * Ctools plugin API.
+ * 
  * Implements hook_ctools_plugin_api().
  */
 function bounce_convert_ctools_plugin_api($module = NULL, $api = NULL) {
@@ -415,6 +418,7 @@ function bounce_convert_form($node, $form_state) {
 
 /**
  * To update form field values after CRUD operation on webforms and user roles.
+ * 
  * Implements hook_form_alter().
  */
 function bounce_convert_form_alter(&$form, &$form_state, $form_id) {
@@ -427,7 +431,7 @@ function bounce_convert_form_alter(&$form, &$form_state, $form_id) {
     }
   }
 
-  // Remove required option from Pages Path setting
+  // Remove required option from Pages Path setting.
   if ($form_id == 'bounce_convert_campaign_node_form') {
     $lang = $form['field_bcc_pages_option']['#language'];
     $form['field_bcc_pages_option'][$lang]['#required'] = FALSE;
@@ -521,17 +525,16 @@ function bounce_convert_page_build(&$page) {
     $bounce_conert_popup_setting['bounce-conert-style']['animation'] = "fadeIn";
     $bounce_conert_popup_setting['bounce-conert-style']['campaign_id'] = $bounce_convert_campaign_id;
     $bounce_conert_popup_setting['bounce-conert-style']['modalTheme'] = "BounceConvertPopup";
-    $bounce_conert_popup_setting['bounce-conert-style']['closeImage'] = theme('image', array('path' => drupal_get_path('module', 'bounce_convert') . '/images/close-button.png', 'alt' => t('Close window'), 'title' => t('Close window')));
 
     drupal_add_js($bounce_conert_popup_setting, 'setting');
 
-    drupal_add_js(array('bounce_convert' => $bounce_convert_js_param,), 'setting');
+    drupal_add_js(array('bounce_convert' => $bounce_convert_js_param), 'setting');
     // Modal link (display:none).
     if (module_exists('modal_forms')) {
       $extracontent = '<a class="bounce-convert-modal-link ctools-use-modal ctools-modal-bounce-conert-style ctools-modal-modal-popup-medium" style="display:none;" href="' . $base_url . '/modal_forms/nojs/webform/' . $bounce_convert_webform_id . '" rel="nofollow">Campaign</a>';
     }
     else {
-      $extracontent = ctools_modal_text_button(t(''), 'ctools_ajax_sample/nojs/bounce-convert/' . $bounce_convert_webform_id, t('Bounce Conver Campaign'), 'bounce-convert-modal-link ctools-modal-bounce-conert-style');
+      $extracontent = ctools_modal_text_button('', 'ctools_ajax_sample/nojs/bounce-convert/' . $bounce_convert_webform_id, t('Bounce Conver Campaign'), 'bounce-convert-modal-link ctools-modal-bounce-conert-style');
     }
     // Add link to content region.and trigger click event on browser exit.
     $page['content']['bounce_convert_modal'] = array(
@@ -543,8 +546,9 @@ function bounce_convert_page_build(&$page) {
 
 /**
  * Create campaign list.
- * @return 
- *    Drupal sortable table with pager.
+ * 
+ * @return array
+ *   Drupal sortable table with pager.
  */
 function bounce_convert_campaign_list() {
   global $base_url;
@@ -625,10 +629,10 @@ function bounce_convert_campaign_list() {
         "header" => $header,
         "rows" => $rows,
         "attributes" => array(),
-        "sticky" => TRUE, // Table header will be sticky.
+        "sticky" => TRUE,
         "caption" => "",
         "colgroups" => array(),
-        "empty" => t("No record found."), // Message if no record found.
+        "empty" => t("No record found."),
           )
       ) . theme("pager");
 
@@ -638,7 +642,8 @@ function bounce_convert_campaign_list() {
 /**
  * Utility function to fetch bounce campaign id from a given webform id.
  * 
- * @param int $webform_id Attach webform id
+ * @param int $webform_id
+ *   Attach webform id
  * 
  * @return int|bool
  *   The bounce convert campaign nid, or FALSE if the given webform is not

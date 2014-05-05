@@ -63,4 +63,3 @@ jQuery(function() {
         jQuery(".bounce-convert-filter-options ul").hide(500);
     });
 });
-

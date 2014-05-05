@@ -11,11 +11,9 @@
  */
 ?>
 <?php global $base_url; ?>
-<?php if ($bounce_convert_filter_url == '/percentage') { ?>
+<?php if ($bounce_convert_filter_url == '/percentage'): ?>
   <div style="font-size:150px;"><?php print $bounce_convert_percentage; ?> %</div>
-  <?php
-}
-?>
+<?php endif; ?>
 <div class="bounce-convert-main-wrapper">
 
   <div class="bounce-convert-tabs-wrapper">
@@ -59,6 +57,5 @@
       </ul>
     </div>
   </div>
-
-
+  
 </div><!--bounce-convert-main-wrapper-->
