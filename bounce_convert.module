@@ -519,6 +519,7 @@ function bounce_convert_page_build(&$page) {
     );
 
     $bounce_conert_popup_setting['bounce-conert-style']['animation'] = "fadeIn";
+    $bounce_conert_popup_setting['bounce-conert-style']['campaign_id'] = $bounce_convert_campaign_id;
     $bounce_conert_popup_setting['bounce-conert-style']['modalTheme'] = "BounceConvertPopup";
     $bounce_conert_popup_setting['bounce-conert-style']['closeImage'] = theme('image', array('path' => drupal_get_path('module', 'bounce_convert') . '/images/close-button.png', 'alt' => t('Close window'), 'title' => t('Close window')));
 
