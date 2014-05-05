@@ -275,7 +275,7 @@ function bounce_convert_field_default_field_bases() {
     'locked' => 0,
     'module' => 'list',
     'settings' => array(
-      'allowed_values' => user_roles($membersonly = FALSE, $permission = NULL),
+      'allowed_values' => user_roles(),
       'allowed_values_function' => '',
     ),
     'translatable' => 0,
