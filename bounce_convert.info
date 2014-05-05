@@ -1,10 +1,10 @@
 name = Bounce Convert
-description = Convert exiting web visitors into leads.
+description = Detect and convert exiting web visitors into revenue
+package = Other
 core = 7.x
-dependencies[] = views
 dependencies[] = webform
-dependencies[] = field_group
-dependencies[] = modal_forms
+dependencies[] = ctools
 dependencies[] = charts
-version = "7.x-1.0-beta1"
+
 stylesheets[all][] = css/bounce_convert.css
+
