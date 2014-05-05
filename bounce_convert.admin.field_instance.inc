@@ -375,7 +375,7 @@ function bounce_convert_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-bounce_convert-field_bcc_specific_user_roles'
+  // Export field_instance: 'node-bounce_convert-field_bcc_specific_user_roles'
   $field_instances['node-bounce_convert-field_bcc_specific_user_roles'] = array(
     'bundle' => 'bounce_convert',
     'default_value' => NULL,

@@ -4,13 +4,14 @@
  * @file
  * Hook_install and Hook_uninstall lives here
  */
+
 // Load bounce_convert.admin.inc
 module_load_include('inc', 'bounce_convert', 'bounce_convert.admin');
 
-// file contains content type default fields
+// File contains content type default fields.
 module_load_include('inc', 'bounce_convert', 'bounce_convert.admin.field_base');
 
-// file contains contenty type default instances
+// File contains contenty type default instances.
 module_load_include('inc', 'bounce_convert', 'bounce_convert.admin.field_instance');
 
 /**
