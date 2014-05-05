@@ -3,13 +3,11 @@
  * @file
  * Customize the display of a campaign report with webform submission results.
  *
- *
  * Available variables:
  * - $bounce_convert_filter_url: Filter if any applied.
  * - $bounce_convert_percentage: Total Percentage.
  * - $bounce_convert_conversions: Total Conversions.
  * - $bounce_convert_impression: Total Impressions.
- *
  */
 ?>
 <?php global $base_url; ?>

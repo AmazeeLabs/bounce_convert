@@ -3,7 +3,6 @@
 /**
  * @file
  * Integrate custom table into views
- *
  */
 
 /**
@@ -131,11 +130,11 @@ function bounce_convert_views_data() {
   );
 
   $data['bounce_convert_impression']['timestamp'] = array(
-    'title' => t('Timestamp'), //Custom external table field
+    'title' => t('Timestamp'),
     'help' => t('Timestamp of when the page was visited.'),
     'field' => array(
       'handler' => 'views_handler_field_date',
-      'click sortable' => TRUE
+      'click sortable' => TRUE,
     ),
     'filter' => array(
       'handler' => 'views_handler_filter_date',
@@ -146,12 +145,12 @@ function bounce_convert_views_data() {
   );
 
   $data['bounce_convert_impression']['id'] = array(
-    'title' => t('Unique identifier for impression'), //Custom external table field
+    'title' => t('Unique identifier for impression'),
     'help' => t('Primary key for table'),
     'field' => array('handler' => 'views_handler_field'),
     'argument' => array('handler' => 'views_handler_argument_numeric'),
     'filter' => array('handler' => 'views_handler_filter_numeric'),
-    'sort' => array('handler' => 'views_handler_sort_numeric')
+    'sort' => array('handler' => 'views_handler_sort_numeric'),
   );
 
   return $data;

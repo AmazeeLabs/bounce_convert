@@ -6,7 +6,6 @@
  *
  * Available variables:
  * - $base_url: Base url of the site
- *
  */
 ?>
 
@@ -18,3 +17,4 @@
   </form>
 </div>
 <br />
+
