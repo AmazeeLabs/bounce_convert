@@ -280,14 +280,15 @@ function bounce_convert_check_page_path($paths, $bounce_convert_pages_option) {
       }
       $pos = strpos(current_path(), $path);
       if ($pos !== FALSE) {
-
         switch ($bounce_convert_pages_option) {
           case 0:
             $bounce_convert_return = FALSE;
             break;
+
           case 1:
             $bounce_convert_return = TRUE;
             break;
+
         }
         return $bounce_convert_return;
       }
@@ -296,9 +297,11 @@ function bounce_convert_check_page_path($paths, $bounce_convert_pages_option) {
           case 0:
             $bounce_convert_return = TRUE;
             break;
+
           case 1:
             $bounce_convert_return = FALSE;
             break;
+
         }
         return $bounce_convert_return;
       }
