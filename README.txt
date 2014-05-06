@@ -20,9 +20,15 @@ web services like Exit Monitor <exitmonitor.com> and Bounce Exchange
 <bounceexchange.com>.
 
 Unlike other Drupal-based solutions (like the Bounce Reasons module
-<drupal.org/project/reasonsbounce>), Bounce Convert treats campaigns as nodes, 
+<drupal.org/project/reasonsbounce>), Bounce Convert treats campagins as nodes, 
 and allows you to collect and track impression and conversion data for every 
 campaign that you run.
+
+================================================================================
+ Screencast
+================================================================================
+
+A brief introductory screencast is available at <http://youtu.be/ilIfhD7J9ek>.
 
 ================================================================================
  DEPENDENCIES
@@ -71,6 +77,15 @@ example, by moving your mouse as if to click your browser's "back" button). The
 modal popup should then be displayed. 
 
 ================================================================================
+ THEMING
+================================================================================
+
+Your webform and modal popup can be themed in the same way that you would
+theme any other Drupal elements. Generally, getting the modal to popup, then 
+inspecting the markup with a tool like Firebug and adding some targetted css to 
+your theme's style.css file is all that is needed.
+
+================================================================================
  TROUBLESHOOTING
 ================================================================================
 
@@ -79,23 +94,23 @@ If your modal popup is not being displayed as expected:
 1. Make sure that you have created a Bounce Convert Campaign node.
 2. Make sure that you are moving your mouse cursor above the browser plane (for
    example, by moving your mouse as if to click your browser's "back" button).
-2. Make sure that your campaign is set to ACTIVE and PUBLISHED (two separate
+3. Make sure that your campaign is set to ACTIVE and PUBLISHED (two separate
    settings).
-3. Check your campaigns page visibility and role visibility settings. For
+4. Check your campaign's page visitility and role visibility settings. For
    testing, we suggest you remove all page rules and role visibility roles.
-4. Make sure that the cookie expiration time has passed, or the popup will
+5. Make sure that the cookie expiration time has passed, or the popup will
    not be shown again for your browser. For testing, set cookie expiration to
    0 (zero).
    
 ================================================================================
- WARNING
+ WARNING ABOUT MULTIPLE ACTIVE CAMPAIGNS
 ================================================================================   
    
 It is possible to have multiple Bounce Convert campaigns running at once, but
 if you have multiple active campaigns running at the same time, make sure that
 the visibility settings for the active campaigns do not overlap. The module
-is not designed to show more than one campaign to the same use on the same page,
-and will break if you try to do so.   
+is not designed to show more than one campaign to the same user on the same 
+page, and will break if you try to do so.   
    
 ================================================================================
  CAMPAIGN REPORTS
