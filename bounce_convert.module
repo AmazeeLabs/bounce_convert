@@ -511,26 +511,26 @@ function bounce_convert_page_build(&$page) {
       'cookie_expiry' => $bounce_convert_cookie_expiry,
       'page_path' => current_path(),
     );
-    $bounce_conert_popup_setting = array();
-    $bounce_conert_popup_setting['bounce-conert-style']['modalSize'] = array(
+    $bounce_convert_popup_setting = array();
+    $bounce_convert_popup_setting['bounce-convert-style']['modalSize'] = array(
       'type' => 'fixed',
       'width' => $bounce_convert_modal_width,
       'height' => $bounce_convert_modal_height,
     );
 
-    $bounce_conert_popup_setting['bounce-conert-style']['modalOptions'] = array(
+    $bounce_convert_popup_setting['bounce-convert-style']['modalOptions'] = array(
       'opacity' => floatval($bounce_convert_modal_opacity),
       'background' => $bounce_convert_modal_bgcolor,
     );
 
-    $bounce_conert_popup_setting['bounce-conert-style']['animation'] = "fadeIn";
-    $bounce_conert_popup_setting['bounce-conert-style']['campaign_id'] = $bounce_convert_campaign_id;
-    $bounce_conert_popup_setting['bounce-conert-style']['modalTheme'] = "BounceConvertPopup";
+    $bounce_convert_popup_setting['bounce-convert-style']['animation'] = "fadeIn";
+    $bounce_convert_popup_setting['bounce-convert-style']['campaign_id'] = $bounce_convert_campaign_id;
+    $bounce_convert_popup_setting['bounce-convert-style']['modalTheme'] = "BounceConvertPopup";
 
-    drupal_add_js($bounce_conert_popup_setting, 'setting');
+    drupal_add_js($bounce_convert_popup_setting, 'setting');
     drupal_add_js(array('bounce_convert' => $bounce_convert_js_param), 'setting');
     // Modal link (display:none).
-    $extracontent = '<a class="bounce-convert-modal-link ctools-use-modal ctools-modal-bounce-conert-style ctools-modal-modal-popup-medium" style="display:none;" href="' . $base_url . '/bounce-convert/nojs/webform/' . $bounce_convert_webform_id . '" rel="nofollow">Bounce Convert hidden link</a>';
+    $extracontent = '<a class="bounce-convert-modal-link ctools-use-modal ctools-modal-bounce-convert-style ctools-modal-modal-popup-medium" style="display:none;" href="' . $base_url . '/bounce-convert/nojs/webform/' . $bounce_convert_webform_id . '" rel="nofollow">Bounce Convert hidden link</a>';
 
     // Add link to content region.and trigger click event on browser exit.
     $page['content']['bounce_convert_modal'] = array(
