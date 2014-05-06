@@ -36,13 +36,10 @@ A brief introductory screencast is available at <http://youtu.be/ilIfhD7J9ek>.
 
 This module requires the following modules be installed:
 
-- Views <https://drupal.org/project/views>
 - CTools <https://drupal.org/project/ctools>
-- Modal Forms <https://drupal.org/project/modal_forms>
 - Webform <https://drupal.org/project/webform>
   - (Tested only with Webform 4.x... may or may not work with 3.x)
 - Charts <https://drupal.org/project/charts>
-- Field Group <https://drupal.org/project/field_group>
 
 ================================================================================
  INSTALLATION
@@ -84,6 +81,9 @@ Your webform and modal popup can be themed in the same way that you would
 theme any other Drupal elements. Generally, getting the modal to popup, then 
 inspecting the markup with a tool like Firebug and adding some targetted css to 
 your theme's style.css file is all that is needed.
+
+Sample css can be found at 
+<https://gist.github.com/JordanMagnuson/ca86c19f7a05e0bff4ba>
 
 ================================================================================
  TROUBLESHOOTING
