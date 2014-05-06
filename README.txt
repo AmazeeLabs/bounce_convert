@@ -80,7 +80,7 @@ modal popup should then be displayed.
 
 Your webform and modal popup can be themed in the same way that you would
 theme any other Drupal elements. Generally, getting the modal to popup, then 
-inspecting the markup with a tool like Firebug and adding some targetted css to 
+inspecting the markup with a tool like Firebug and adding some targeted css to 
 your theme's style.css file is all that is needed.
 
 Sample css can be found at 

@@ -4,7 +4,10 @@
  * @file
  * All functions within this file are related to admin
  */
-// All functions within this file need the bellow files.
+
+/**
+ * All functions within this file need the bellow files.
+ */
 define('BOUNCE_CONVERT_CONTENT_TYPE', 'bounce_convert_campaign');
 
 /**
@@ -29,9 +32,10 @@ function bounce_convert_webforms() {
 
 /**
  * Return campagins per uesr role type.
- * 
- * @param user_rids role ids of login user.
- * 
+ *
+ * @param array $user_rids
+ *   Role ids of login user.
+ *
  * @return bool
  *   Whether to show or not the campaign.
  */
@@ -91,11 +95,11 @@ function bounce_convert_check_campaigns($user_rids) {
 
 /**
  * Return a list of paths.
- * 
- * @param object $node 
+ *
+ * @param object $node
  *   Contains information about campaign.
- * 
- * @return array 
+ *
+ * @return array
  *   list of path/pages for particular campaign.
  */
 function bounce_convert_path_list($node, $bounce_convert_pages_option) {
@@ -126,10 +130,10 @@ function bounce_convert_path_list($node, $bounce_convert_pages_option) {
 
 /**
  * Fetch node object properties.
- * 
- * @param object $node 
+ *
+ * @param object $node
  *   Contains information about campaign.
- * 
+ *
  * @return array
  *   Webform properties.
  */
@@ -167,18 +171,18 @@ function bounce_convert_get_webform_properties($node) {
 
 /**
  * Check if campaign is for particular role users.
- *  
+ *
  * @param object $node
  *   Node containing campaign properties.
- * 
- * @param array $user_rids 
+ *
+ * @param array $user_rids
  *   User role ids to match with campaign assigned roles.
- * 
+ *
  * @return bool
  *   Return TRUE if no role is set or user role matches.
  */
 function bounce_convert_check_user_role($node, $user_rids) {
-  // Check if role is set for campaing
+  // Check if role is set for campaing.
   if (!empty($node->field_bcc_specific_user_roles)) {
 
     // Get all roles which is set for that particular campaign.
@@ -205,13 +209,13 @@ function bounce_convert_check_user_role($node, $user_rids) {
 
 /**
  * Wheater show modal on current page/path or not.
- * 
- * @param array $paths 
+ *
+ * @param array $paths
  *   List of paths/pages to show campaign on.
- * 
- * @param array $bounce_convert_pages_option 
+ *
+ * @param array $bounce_convert_pages_option
  *   Only listed pages/Except Listed.
- * 
+ *
  * @return bool
  *   Whether path matched or not for a campaign.
  */
@@ -243,9 +247,11 @@ function bounce_convert_check_page_path($paths, $bounce_convert_pages_option) {
       case 0:
         $bounce_convert_return = FALSE;
         break;
+
       case 1:
         $bounce_convert_return = TRUE;
         break;
+
     }
     return $bounce_convert_return;
   }
@@ -260,9 +266,11 @@ function bounce_convert_check_page_path($paths, $bounce_convert_pages_option) {
           case 0:
             $bounce_convert_return = FALSE;
             break;
+
           case 1:
             $bounce_convert_return = TRUE;
             break;
+
         }
         return $bounce_convert_return;
       }
@@ -299,13 +307,13 @@ function bounce_convert_check_page_path($paths, $bounce_convert_pages_option) {
 }
 
 /**
- *  Evaluate user given PHP code.
- * 
- * @param string $code 
+ * Evaluate user given PHP code.
+ *
+ * @param string $code
  *   PHP code which need to be evolated.
- * 
+ *
  * @return bool
- *   Whether PHP return TURE or FALSE. 
+ *   Whether PHP return TURE or FALSE.
  */
 function bounce_convert_check_php_code($code) {
   $code = html_entity_decode($code);
@@ -348,11 +356,11 @@ function bounce_convert_delete_fields() {
 
 /**
  * When user submits campaign an entry is made in DB.
- * 
- * @param array $form 
+ *
+ * @param array $form
  *   Contains form elements.
- * 
- * @param array $form_state 
+ *
+ * @param array $form_state
  *   Contains form fields value.
  */
 function bounce_convert_user_conversion(&$form, &$form_state) {
@@ -373,13 +381,13 @@ function bounce_convert_user_conversion(&$form, &$form_state) {
 
 /**
  * Return impression/conversion data array from DB.
- * 
+ *
  * @param string $report_duration
  *   Time duration.
- * 
+ *
  * @param string $db_column
  *   Table column name.
- * 
+ *
  * @return array
  *   Resut containing impressions and conversions.
  */
@@ -549,10 +557,10 @@ function bounce_convert_chart_data($report_duration, $db_column, $nid) {
 
 /**
  * Create campaign report for chart.
- * 
+ *
  * @param array $report_duration
  *   Time duration.
- * 
+ *
  * @return array
  *   Contains labels per filter type(ie:for days,Months,hours etc.)
  */
@@ -639,6 +647,7 @@ function bounce_convert_chart_labels($report_duration) {
 
 /**
  * Total days of last month.
+ *
  * @return int
  *   Number of days from last month.
  */
@@ -653,6 +662,8 @@ function bounce_convert_count_last_month_days() {
 }
 
 /**
+ * Get nicely formatted converion percentage.
+ *
  * @return float
  *   Conversion Percentage * (Conversion/Submission) * 100.
  */
