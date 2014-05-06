@@ -59,7 +59,7 @@ function bounce_convert_menu() {
   );
 
   // Ctools modal form.
-  $items['ctools_ajax_sample/%ctools_js/bounce-convert/%'] = array(
+  $items['bounce-convert/%ctools_js/webform/%'] = array(
     'title' => 'Campaign',
     'page callback' => 'bounce_convert_ctools_modal',
     'page arguments' => array(1, 3),
@@ -79,13 +79,13 @@ function bounce_convert_ctools_modal($js, $webform_nid) {
 
 /**
  * Handle CTools modal webforms.
- * 
+ *
  * @param type $js
  *   Whether to $js available or not.
- * 
+ *
  * @param type $webform_nid
  *   Nid of the webform.
- * 
+ *
  * @return array
  *   Modal popup
  */
@@ -164,7 +164,7 @@ function bounce_convert_impression_callback() {
 
 /**
  * Show chart and submissions on campaign report page.
- * @return array 
+ * @return array
  *   contains admin report chart and form submission data.
  */
 function bounce_convert_get_submissions() {
@@ -236,7 +236,7 @@ function bounce_convert_get_submissions() {
 
 /**
  * Theme filter option for chart.
- * 
+ *
  * Implements hook_theme().
  */
 function bounce_convert_theme() {
@@ -260,7 +260,7 @@ function bounce_convert_theme() {
 
 /**
  * Ctools plugin API.
- * 
+ *
  * Implements hook_ctools_plugin_api().
  */
 function bounce_convert_ctools_plugin_api($module = NULL, $api = NULL) {
@@ -418,7 +418,7 @@ function bounce_convert_form($node, $form_state) {
 
 /**
  * To update form field values after CRUD operation on webforms and user roles.
- * 
+ *
  * Implements hook_form_alter().
  */
 function bounce_convert_form_alter(&$form, &$form_state, $form_id) {
@@ -487,6 +487,7 @@ function bounce_convert_page_build(&$page) {
   // Fetch only campaigns that user role has permission for that.
   $data = bounce_convert_check_campaigns($user->roles);
 
+  drupal_add_library('system', 'drupal.ajax');
   ctools_include('modal');
   ctools_include('ajax');
   ctools_modal_add_js();
@@ -527,15 +528,10 @@ function bounce_convert_page_build(&$page) {
     $bounce_conert_popup_setting['bounce-conert-style']['modalTheme'] = "BounceConvertPopup";
 
     drupal_add_js($bounce_conert_popup_setting, 'setting');
-
     drupal_add_js(array('bounce_convert' => $bounce_convert_js_param), 'setting');
     // Modal link (display:none).
-    if (module_exists('modal_forms')) {
-      $extracontent = '<a class="bounce-convert-modal-link ctools-use-modal ctools-modal-bounce-conert-style ctools-modal-modal-popup-medium" style="display:none;" href="' . $base_url . '/modal_forms/nojs/webform/' . $bounce_convert_webform_id . '" rel="nofollow">Campaign</a>';
-    }
-    else {
-      $extracontent = ctools_modal_text_button('', 'ctools_ajax_sample/nojs/bounce-convert/' . $bounce_convert_webform_id, t('Bounce Conver Campaign'), 'bounce-convert-modal-link ctools-modal-bounce-conert-style');
-    }
+    $extracontent = '<a class="bounce-convert-modal-link ctools-use-modal ctools-modal-bounce-conert-style ctools-modal-modal-popup-medium" style="display:none;" href="' . $base_url . '/bounce-convert/nojs/webform/' . $bounce_convert_webform_id . '" rel="nofollow">Bounce Convert hidden link</a>';
+
     // Add link to content region.and trigger click event on browser exit.
     $page['content']['bounce_convert_modal'] = array(
       '#markup' => $extracontent,
@@ -546,7 +542,7 @@ function bounce_convert_page_build(&$page) {
 
 /**
  * Create campaign list.
- * 
+ *
  * @return array
  *   Drupal sortable table with pager.
  */
@@ -641,10 +637,10 @@ function bounce_convert_campaign_list() {
 
 /**
  * Utility function to fetch bounce campaign id from a given webform id.
- * 
+ *
  * @param int $webform_id
  *   Attach webform id
- * 
+ *
  * @return int|bool
  *   The bounce convert campaign nid, or FALSE if the given webform is not
  *   associated with a bounce convert campaign.
