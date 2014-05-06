@@ -37,6 +37,7 @@ A brief introductory screencast is available at <http://youtu.be/ilIfhD7J9ek>.
 This module requires the following modules be installed:
 
 - CTools <https://drupal.org/project/ctools>
+- Modal Forms <https://drupal.org/project/modal_forms>
 - Webform <https://drupal.org/project/webform>
   - (Tested only with Webform 4.x... may or may not work with 3.x)
 - Charts <https://drupal.org/project/charts>

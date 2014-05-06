@@ -58,69 +58,7 @@ function bounce_convert_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  // Ctools modal form.
-  $items['bounce-convert/%ctools_js/webform/%'] = array(
-    'title' => 'Campaign',
-    'page callback' => 'bounce_convert_ctools_modal',
-    'page arguments' => array(1, 3),
-    'access callback' => TRUE,
-    'type' => MENU_CALLBACK,
-  );
-
   return $items;
-}
-
-/**
- * Fetch CTools modal webforms.
- */
-function bounce_convert_ctools_modal($js, $webform_nid) {
-  return bounce_convert_ajax_modal_webform($js, $webform_nid);
-}
-
-/**
- * Handle CTools modal webforms.
- *
- * @param type $js
- *   Whether to $js available or not.
- *
- * @param type $webform_nid
- *   Nid of the webform.
- *
- * @return array
- *   Modal popup
- */
-function bounce_convert_ajax_modal_webform($js = NULL, $webform_nid = NULL) {
-  $node = node_load($webform_nid);
-  $submission = (object) array();
-  if (!$js) {
-    return drupal_get_form('webform_client_form_' . $webform_nid, $node, $submission);
-  }
-  ctools_include('modal');
-  ctools_include('ajax');
-  $form_state = array(
-    'title' => $node->title,
-    'ajax' => TRUE,
-  );
-  // Fetch webform form stuff.
-  $args = array($node, $submission);
-  $form_state['build_info']['args'] = $args;
-  $output = ctools_modal_form_wrapper('webform_client_form_' . $webform_nid, $form_state);
-  $webform_submited = isset($form_state['webform_completed']) ? $form_state['webform_completed'] : FALSE;
-  if ($webform_submited == TRUE) {
-    $confirm_message = db_query("SELECT confirmation FROM {webform} WHERE nid = :webform_nid", array(':webform_nid' => $webform_nid))->fetchField();
-    if ($confirm_message == "") {
-      $confirm_message = "Thank you, your submission has been received.";
-    }
-    $confirm_message = array("#markup" => '<div>' . $confirm_message . '</div>');
-    $confirmation['#markup'] = '<div class="popups-confirmation-wrapper">' .
-        drupal_render($confirm_message) .
-        '</div>';
-    $output = array(); // Recreate output.
-    $output[] = ctools_modal_command_display('Confirmation', $confirmation);
-  }
-
-  print ajax_render($output);
-  exit;
 }
 
 /**
@@ -487,7 +425,6 @@ function bounce_convert_page_build(&$page) {
   // Fetch only campaigns that user role has permission for that.
   $data = bounce_convert_check_campaigns($user->roles);
 
-  drupal_add_library('system', 'drupal.ajax');
   ctools_include('modal');
   ctools_include('ajax');
   ctools_modal_add_js();
@@ -529,8 +466,9 @@ function bounce_convert_page_build(&$page) {
 
     drupal_add_js($bounce_convert_popup_setting, 'setting');
     drupal_add_js(array('bounce_convert' => $bounce_convert_js_param), 'setting');
-    // Modal link (display:none).
-    $extracontent = '<a class="bounce-convert-modal-link ctools-use-modal ctools-modal-bounce-convert-style ctools-modal-modal-popup-medium" style="display:none;" href="' . $base_url . '/bounce-convert/nojs/webform/' . $bounce_convert_webform_id . '" rel="nofollow">Bounce Convert hidden link</a>';
+
+    // Hidden modal link (depends on modal_forms module).
+    $extracontent = '<a class="bounce-convert-modal-link ctools-use-modal ctools-modal-bounce-convert-style ctools-modal-modal-popup-medium" style="display:none;" href="' . $base_url . '/modal_forms/nojs/webform/' . $bounce_convert_webform_id . '" rel="nofollow">Bounce Convert hidden link</a>';
 
     // Add link to content region.and trigger click event on browser exit.
     $page['content']['bounce_convert_modal'] = array(
