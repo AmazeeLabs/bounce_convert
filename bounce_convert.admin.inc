@@ -122,7 +122,7 @@ function bounce_convert_path_list($node, $bounce_convert_pages_option) {
     else {
       // Return PHP code as it is.
       $bounce_convert_field_visibility_settings = field_get_items('node', $node, 'field_bcc_pages_list');
-      $bounc_convert_paths = $bounce_convert_field_visibility_settings[0]['safe_value'];
+      $bounc_convert_paths = $bounce_convert_field_visibility_settings[0]['value'];
     }
   }
   return $bounc_convert_paths;
@@ -319,9 +319,7 @@ function bounce_convert_check_page_path($paths, $bounce_convert_pages_option) {
  *   Whether PHP return TURE or FALSE.
  */
 function bounce_convert_check_php_code($code) {
-  $code = html_entity_decode($code);
   $result = php_eval($code);
-
   if ($result == TRUE) {
     return TRUE;
   }
